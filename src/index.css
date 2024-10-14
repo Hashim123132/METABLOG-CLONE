@@ -1,0 +1,8 @@
+
+body {
+  min-height: 10000px; /* Change to desired height to force scrolling */
+  overflow-y: auto;  /* Allow vertical scrolling */
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
