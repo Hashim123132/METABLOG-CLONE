@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xsm': '430px', 
+      },
       colors: {
         'custom-gray': 'rgb(36, 37, 53)',
         'custom-dark-green': 'rgb(37, 53, 37)',
