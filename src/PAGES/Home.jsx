@@ -13,7 +13,7 @@ const Home = () => {
                                                                           {/*IMAGE 1 SECTIONcd  SYNTAX FOR PAGE 2 AS WELL  JUST REMOVE THIS FIRST DIV*/}
                         <div className='xsm: absolute inset-72 left-[10px]  bg-custom-dark text-white h-[139px] -mt-[90px] ml-[50px] xsm: w-[310px] p-5 rounded-xl flex flex-col items-center border-solid border border-slate-800  lg:left-[300px]  lg:h-[285px] lg:mt-10 lg:w-[598px] lg:p-10'>
                               <h2 className=' xsm: text-xs bg-[#4B6BFB] rounded-lg mr-auto p-1 mb-3 lg:text-base'>Technology</h2>
-                              <p className='xsm:font-semibold text-xs w-[518] lg:text-3xl '>The Impact of Technology on the Workplace: How Technology is Changing</p>
+                              <p className='xsm:font-semibold text-xs lg:text-3xl '>The Impact of Technology on the Workplace: How Technology is Changing</p>
                               <div className='xsm:flex space-x-4 items-center pt-2 text-xs lg:mr-auto lg:pt-5 lg:text-base'>
                               <img className='w-[13px] -ml-[55px] rounded-full lg:w-10 lg:-ml-[5px]' src="./IMAGES/9a54dc57c3bfdd71f8ab78628ef9ac9a.jpeg" alt="" />
                                   <p className=''>Jason Francisco</p>
@@ -36,14 +36,14 @@ const Home = () => {
                
                                                   {/* griding here below: */}
                                                   
-               <div className='xsm:grid grid-cols-1  px-[35px] mt-8 lg:grid lg:grid-cols-3  lg:px-[210px]'>
+               <div className='xsm:grid grid-cols-1  px-[35px] mt-8 lg:grid lg:grid-cols-3 gap-5  lg:px-[210px]'>
                 
                   <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4  lg:w-[392px]  '>
                     <img className=' rounded-xl  ' src="./IMAGES/585632b9d05dcfd0daffacedd55842f5.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>
                   
-                    <div className='xsm:flex items-center  justify-center space-x-5 -ml-[60px] mt-3 : '>
+                    <div className='xsm:flex items-center  justify-center space-x-5 -ml-[60px]  : '>
                       <img className='w-[36px] rounded-full ml-10 lg:-ml-1' src="/IMAGES/faedfd7f834c47ba118f3895ffc519cd.jpeg" alt="" />
                       <p className='text-[#97989F] font-medium'>Tracey Wilson</p>
                       <p className='text-[#97989F] font-normal'>August 20, 2022</p>
@@ -80,7 +80,7 @@ const Home = () => {
                   </div>
                                                   {/* GRID 3 IMAGE ABOVE HERE */}
 
-                  <div className='xsm:border-solid border mt-5 border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
+                  <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
                     <img className=' rounded-xl object-cover w-[100%] h-[239px]' src="./IMAGES/d484b871abb15e732abb0a69f2ccd525.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>
@@ -94,7 +94,7 @@ const Home = () => {
                   </div>
                                                 {/* GRID IMAGE 4 ABOVE HERE */}
 
-                  <div className='xsm:border-solid border mt-5 border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
+                  <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
                     <img className=' object-cover rounded-xl w-[100%] h-[239px]' src="./IMAGES/94d6445161ab63109e6e813699b61984.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>
@@ -108,7 +108,7 @@ const Home = () => {
                   </div>
                                                  {/* GRID 5 IMAGE ABOVE HERE */}
 
-                  <div className='xsm:border-solid border mt-5 border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
+                  <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
                     <img className=' object-cover rounded-xl w-[100%] h-[53%]  object-bottom ' src="./IMAGES/dc5bf5a2de00232ed3b7e18eadcbe03a.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>
@@ -122,7 +122,7 @@ const Home = () => {
                   </div>
                                                  {/* GRID 6 IMAGE ABOVE HERE */}
 
-                  <div className='xsm:border-solid border mt-5 border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
+                  <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
                     <img className=' rounded-xl w-[100%] h-[53%] object-cover' src="./IMAGES/0ba138a3797a763d4510333166532abb.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>
@@ -136,7 +136,7 @@ const Home = () => {
                   </div>
                                                  {/* GRID IMAGE 7 ABOVE HERE */}
 
-                  <div className='xsm:border-solid border mt-5 border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
+                  <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
                     <img className=' object-cover rounded-xl w-[100%] h-[53%] ' src="./IMAGES/47643788a57b79a4aa1d6c6db76208a5.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>
@@ -150,7 +150,7 @@ const Home = () => {
                   </div>
                                                   {/* GRID 8 IMAGE ABOVE HERE */}
 
-                  <div className='xsm:border-solid border mt-5 border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
+                  <div className='xsm:border-solid border  border-slate-800 rounded-xl w-[352px] h-[488px] p-4 lg:w-[392px]'>
                     <img className=' object-cover rounded-xl w-[100%] h-[53%]  ' src="./IMAGES/16e4297057a78fcd78323914d00b0bf8.jpeg" alt="" />
                     <p className='  text-[#4B6BFB] bg-[#4B6BFB0D] rounded-lg mr-auto p-1 ml-2 mb-3 mt-6 flex justify-center w-[30%] '>Technology</p>
                     <p className='text-white font-semibold text-2xl ml-2'>The Impact of Technology on the Workplace: How Technology is Changing</p>

@@ -2,7 +2,7 @@ import React from 'react'
 
 const Pages = () => {
   return (
-    <div className='w-full h-screen  ' >
+    <div className='overflow-x-hidden lg:overflow-x-auto ' >
       
                        
     
@@ -10,23 +10,23 @@ const Pages = () => {
     
  
                              {/* THIS ABOVE IS STYLING IS HEADER  */}                                                  
-               <div className='bg-[#242535] rounded-lg mx-auto mt-[70px] w-[1216px] h-[344px] p-[48px] '>
-                  <div className='flex justify-center items-center'>
-                    <img className='w-[64px] h-[64px]' src="./IMAGES/6891be7496ccabdc2fd0b1a1d8a535d7.png" alt="" />
+               <div className='xsm:bg-[#242535] rounded-lg mx-auto mt-[70px]  h-[239px] w-[400px]  p-[20px] lg:w-[1216px] lg:h-[344px] lg:p-[48px]   '>
+                  <div className='xsm:flex justify-center -mt-[10px] lg:mt-[10px]'>
+                    <img className='xsm:w-[44px] h-[44px] lg:w-[64px] lg:h-[64px]' src="./IMAGES/6891be7496ccabdc2fd0b1a1d8a535d7.png" alt="" />
                       <div className='ml-3'>
-                        <p className='text-white font-medium text-xl'>Jonathan Doe</p>
-                        <p className='text-[#BABABF]'>Collaborator & Editor</p>
+                        <p className='text-white font-medium text-xs lg:text-xl'>Jonathan Doe</p>
+                        <p className='text-[#BABABF]  text-xs lg:text-base'>Collaborator & Editor</p>
                         
                       </div>
                   
                   </div>
                     <div class="text-center mt-6 ">
-                      <span class="text-lg  block  text-[#BABABF]">Meet Jonathan Doe, a passionate writer and blogger with a love for</span>
-                      <span class="text-lg  block  text-[#BABABF]">technology and travel. Jonathan holds a degree in Computer Science and</span>
-                      <span class="text-lg  block  text-[#BABABF]">has spent years working in the tech industry, gaining a deep understanding </span>
-                      <span class="text-lg  block  text-[#BABABF]">of the impact technology has on our lives.</span>
+                      <span class="xsm:text-xs  block  text-[#BABABF] lg:text-lg">Meet Jonathan Doe, a passionate writer and blogger with a love for</span>
+                      <span class="xsm:text-xs  block  text-[#BABABF] lg:text-lg">technology and travel. Jonathan holds a degree in Computer Science and</span>
+                      <span class="xsm:text-xs  block  text-[#BABABF] lg:text-lg">has spent years working in the tech industry, gaining a deep understanding </span>
+                      <span class="xsm:text-xs  block  text-[#BABABF] lg:text-lg">of the impact technology has on our lives.</span>
                     </div>
-                    <div className='flex justify-center items-center space-x-2 mt-5'>
+                    <div className='xsm:flex justify-center items-center space-x-2 mt-2 lg:mt-5'>
                       <div className='bg-[#696A75] rounded-lg w-[32px] h-[32px]'></div>
                       <div className='bg-[#696A75] rounded-lg w-[32px] h-[32px]'></div>
                       <div className='bg-[#696A75] rounded-lg w-[32px] h-[32px]'></div>
@@ -36,11 +36,11 @@ const Pages = () => {
                                              
                                             {/* LATEST POSTS WALA SECTION */}
            
-           <div className='font-bold text-2xl text-white mt-10 ml-[13%] '>Latest Post</div>
+           <div className='xsm:font-bold text-2xl text-white mt-10 ml-[13%] '>Latest Post</div>
            
                                               {/* griding here below: */}
                                               
-           <div className='grid grid-cols-3  px-[210px] mt-8'>
+           <div className='xsm:grid grid-cols-1 px-[20px] mt-8 gap-5 lg:grid lg:grid-cols-3 lg:px-[210px]'>
             
               <div className='border-solid border  border-slate-800 rounded-xl w-[392px] h-[488px] p-4'>
                 <img className=' rounded-xl  ' src="./IMAGES/585632b9d05dcfd0daffacedd55842f5.jpeg" alt="" />
@@ -187,9 +187,9 @@ const Pages = () => {
          
          
         
-            <div className='bg-[#141624] border-t border-b border-solid border-t-slate-800 border-b-slate-800 min-h-screen mt-20 ' >
+            <div className='xsm:bg-[#141624] border-t border-b border-solid border-t-slate-800 border-b-slate-800 min-h-screen mt-20 ' >
              
-              <div className='flex justify-center items-center space-x-36 mt-14'>
+              <div className='hidden lg:flex justify-center items-center space-x-36 mt-14'>
 
               
                       <div className='p-4 '>
@@ -241,12 +241,12 @@ const Pages = () => {
                                                                         {/* Weekly Newsletter KI DIV ABOVE  */}
                     </div>
                             <hr className="border-t-1 border-[#3B3C4A] w-[1275px] mx-auto mt-10" />
-                    <div className='flex justify-around items-center'>
+                    <div className='xsm:flex flex-col justify-around items-center lg:flex '>
                            
                            
-                            <div className='w-[305px] mt-10 '>
+                            <div className='xsm:w-[305px] mt-10 text-center'>
                               <h1 className='text-white text-xl '>Meta<span className='text-white font-extrabold'>Blog</span></h1>
-                              <p className='text-white text-[16px]'>© JS Template <span className='text-[#BABABF]'>2024. All Rights Reserved.</span></p>
+                              <p className='hidden lg:flex text-white text-[16px]'>© JS Template <span className='text-[#BABABF]'>2024. All Rights Reserved.</span></p>
                             </div>
                                                                         {/* LOGO AND TRADEMARKS */}
                             <div className='flex items-center text-[#BABABF] mt-[70px]'>
