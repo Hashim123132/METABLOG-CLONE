@@ -1,15 +1,18 @@
 {
-  "name": "my-project",
+  "name": "metablogclone-project",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite", 
     "build": "vite build",
+    "start": "vite",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "both": "concurrently \"npm run start\" \"cd backend && npx nodemon index.js\"  "
   },
   "dependencies": {
+    "concurrently": "^9.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2"
