@@ -1,85 +1,92 @@
-import React, { useState } from "react"
-import {useNavigate} from 'react-router-dom'
+import React, { useState } from 'react';
+import axios from 'axios';
+
 const Signup = () => {
- 
- 
-  const [credentials, setCredentials] = useState({name:'', email:'', password:'', cpassword:''})
-  const navigate = useNavigate();
-  
-  const handleSubmit = async (e)=>{
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    const {name, email, password ,cpassword} = credentials
 
-    if (password !== cpassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    //Sending POST request to create user 
-    const response = await fetch('http://localhost:5000/api/auth/createuser', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({name, email, password})
-      
-    });
-    const json = await response.json()
-    if(json.success){
-      //save the auth token
-      localStorage.setItem('token', json.authtoken)
-      navigate('/')
+    const userData = { name, email, password };
 
-    }
-    else{
-      alert('invalid credentials')
-    }
-    
-    
-    
-   
-  }
+    try {
+      // Make POST request to backend to create the user
+      const response = await axios.post('http://localhost:5000/api/auth/createuser', userData);
 
-  const onChange = (e) =>{
-    setCredentials({...credentials, [e.target.name]: e.target.value})
-  }
-  
-  
+      if (response.data.success) {
+        alert('User created successfully!');
+      } else {
+        setErrorMessage(response.data.error || 'Failed to create user');
+      }
+    } catch (error) {
+      console.error('Error during signup:', error);
+      setErrorMessage('Error creating user. Please try again later.');
+    }
+  };
+
   return (
-   <>
-    <form onSubmit={handleSubmit} >
-    <div className='flex justify-center items-center h-screen'>
-      <div className='bg-[#242535] rounded-lg p-[32px] w-[390px] h-[500px] border border-solid border-[#3B3C4A]'>
-        <div className='flex flex-col justify-center items-center'>
-          <h1 className='font-semibold text-white text-[20px]'>SignUp</h1>
-          <p className='font-[#97989F] font-normal text-[#97989F] text-[20px] '>Hello New User!</p>
+    <form onSubmit={handleSubmit} noValidate>
+      <div className="flex justify-center items-center h-screen">
+        <div className="bg-[#242535] rounded-lg p-[32px] w-[390px] h-[500px] border border-solid border-[#3B3C4A]">
+          <div className="flex flex-col justify-center items-center">
+            <h1 className="font-semibold text-white text-[20px]">Sign Up</h1>
+            <p className="font-[#97989F] font-normal text-[#97989F] text-[20px]">Create a New Account</p>
+          </div>
+
+          {/* Name Field */}
+          <input
+            type="text"
+            id="name"
+            className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] mt-7"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            name="name"
+          />
+
+          {/* Email Field */}
+          <input
+            type="email"
+            id="email"
+            className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] mt-7"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            name="email"
+            aria-describedby="emailHelp"
+          />
+
+          {/* Password Field */}
+          <input
+            type="password"
+            className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] mt-7"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            id="password"
+          />
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="rounded-md p-2 text-white font-semibold bg-[#4B6BFB] py-[12px] px-[16px] w-[320px] mt-7 transition-opacity duration-300 hover:opacity-80"
+          >
+            Sign Up
+          </button>
+
+          {/* Error message */}
+          {errorMessage && (
+            <p className="mt-4 text-center text-sm text-red-500">{errorMessage}</p>
+          )}
         </div>
-          <div className="flex flex-col space-y-6 mt-5">
-          
-                      {/* name */}
-                      
-                      <input type="text" id="name" className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] " placeholder="Enter your name" value={credentials.name}  onChange={onChange}  name='name' aria-describedby="nameHelp"/>        
-
-                      {/* email */}
-
-                      <input type="email" id="email" className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] " placeholder="Enter your Email" value={credentials.email}  onChange={onChange}  name='email' aria-describedby="emailHelp"/>        
-
-                      {/* Password */}
-
-
-                      <input type="password" className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] " placeholder="Enter your password" value={credentials.password} onChange={onChange}  name='password' />
-
-                      {/* confirm Password */}
-
-                      <input type="password" className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px]"  placeholder="Enter your password again" value={credentials.cpassword} onChange={onChange}  name='cpassword' /> 
-                     
-                      <button className='rounded-md p-2 text-white font-semibold bg-[#4B6BFB] py-[12px] px-[16px] w-[320px] mt-2 transition-opacity duration-300 hover:opacity-80'>Signup</button>              
-            
-          </div>       
       </div>
-    </div>
     </form>
-   
-   </>
-  )
-}
+  );
+};
 
-export default Signup
+export default Signup;

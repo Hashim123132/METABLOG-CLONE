@@ -1,3 +1,28 @@
+@font-face {
+  font-family : Work Sans;
+  src:url(../public/FONTS/Work_Sans/WorkSans-VariableFont_wght.ttf)
+}
+
+.toggle-btn:hover {
+  background-color: #3b57d1;
+}
+*{
+  @apply transition-colors duration-100
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @tailwind base;
 @tailwind components;
