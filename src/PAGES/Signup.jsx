@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import {useNavigate } from 'react-router-dom'; // Import usenavigate
+import { useState } from 'react';
 import axios from 'axios';
+import CustomAlert from './CustomAlert';
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();  // Initialize navigate to navigate programmatically
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -18,7 +22,11 @@ const Signup = () => {
       const response = await axios.post('http://localhost:5000/api/auth/createuser', userData);
 
       if (response.data.success) {
-        alert('User created successfully!');
+        setSuccessMessage('User created successfully! Redirecting to login...');
+        setTimeout(() => {
+          // Redirect to login page after 2 seconds
+          navigate('/login');
+        }, 2000); // Redirect after 2 seconds
       } else {
         setErrorMessage(response.data.error || 'Failed to create user');
       }
@@ -79,14 +87,20 @@ const Signup = () => {
             Sign Up
           </button>
 
-          {/* Error message */}
+          {/* Error or Success Message */}
           {errorMessage && (
             <p className="mt-4 text-center text-sm text-red-500">{errorMessage}</p>
+          )}
+          {successMessage && (
+            <CustomAlert
+              message={successMessage}
+              type="success"
+              onClose={() => setSuccessMessage('')}
+            />
           )}
         </div>
       </div>
     </form>
   );
 };
-
-export default Signup;
+export default Signup

@@ -42,7 +42,7 @@ const Login = () => {
       if (json.success) {
         localStorage.setItem("token", json.authtoken); // Save the token
         showAlert("User logged in successfully", "success");
-        navigate("/dashboard"); // Redirect to dashboard after successful login
+        navigate("/Home"); 
       } else {
         showAlert("Invalid credentials", "danger");
       }
