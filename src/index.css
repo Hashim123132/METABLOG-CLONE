@@ -9,6 +9,28 @@
 *{
   @apply transition-colors duration-100
 }
+/* Parallax Transition */
+.parallax-enter {
+  transform: translateY(50px);
+  opacity: 0;
+}
+
+.parallax-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 500ms ease, opacity 500ms ease;
+}
+
+.parallax-exit {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.parallax-exit-active {
+  transform: translateY(-50px);
+  opacity: 0;
+  transition: transform 500ms ease, opacity 500ms ease;
+}
 
 
 

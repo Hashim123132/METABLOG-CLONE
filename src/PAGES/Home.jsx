@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Blog from './Blog';
 import blogs from './blogData';
 
@@ -17,18 +18,27 @@ const Home = () => {
       {/* Image Section */}
       <div className='relative'>
         <img
-          className='xsm: h-[239px] w-[400px] object-cover ml-[15px] rounded-lg mt-8 lg:h-[550px] lg:w-[1216px] lg:mx-auto'
+          className='xsm:h-[239px] w-[400px] object-cover ml-[15px] rounded-lg mt-8 lg:h-[550px] lg:w-[1216px] lg:mx-auto'
           src="/IMAGES/0ba138a3797a763d4510333166532abb.jpeg"
-          alt=""
+          alt="Hero"
         />
+        
         {/* Blog Post Description */}
-        <div className='xsm: dark:bg-custom-dark dark:text-white dark:border-solid dark:border-[#242535] absolute inset-72 left-[10px] bg-white h-[139px] -mt-[90px] ml-[50px] xsm:w-[310px] p-5 rounded-xl flex flex-col items-center border-solid border border-[#E8E8EA] lg:left-[300px] lg:h-[285px] lg:mt-10 lg:w-[598px] lg:p-10'>
+        <div className='xsm:dark:bg-custom-dark dark:text-white dark:border-solid dark:border-[#242535] absolute inset-72 left-[10px] bg-white h-[139px] -mt-[90px] ml-[50px] xsm:w-[310px] p-5 rounded-xl flex flex-col items-center border-solid border border-[#E8E8EA] lg:left-[300px] lg:h-[285px] lg:mt-10 lg:w-[598px] lg:p-10'>
           <h2 className='xsm:text-white text-xs bg-[#4B6BFB] rounded-lg mr-auto p-1 mb-3 lg:text-base'>Technology</h2>
           <p className='xsm:font-semibold text-xs lg:text-3xl'>The Impact of Technology on the Workplace: How Technology is Changing</p>
           <div className='xsm:flex space-x-4 items-center pt-2 text-xs lg:mr-auto lg:pt-5 lg:text-base'>
-            <img className='w-[13px] -ml-[55px] rounded-full lg:w-10 lg:-ml-[5px]' src="./IMAGES/jasonfrancisco.jpeg" alt="" />
-            <p className=''>Jason Francisco</p>
-            <p className=''>August 20, 2022</p>
+        
+            {/* Author Image Link */}
+            <Link to={`/author/${"jasonfrancisco".toLowerCase().replace(/\s/g, '')}`} className="flex items-center space-x-4">
+              <img 
+                src="./IMAGES/jasonfrancisco.jpeg" 
+                alt="Author's Profile"
+                className="w-16 h-16 rounded-full" 
+              />
+            <p>Jason Francisco</p>
+            </Link>
+            <p>August 20, 2022</p>
           </div>
         </div>
       </div>
@@ -62,7 +72,6 @@ const Home = () => {
       </div>
 
       {/* Load More Button */}
-      
       {displayCount < blogs.length && (
         <div className="flex justify-center mt-10">
           <button
@@ -158,6 +167,6 @@ const Home = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Home;

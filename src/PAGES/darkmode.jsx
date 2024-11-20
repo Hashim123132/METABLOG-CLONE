@@ -1,6 +1,4 @@
-import React from 'react'
-import { useEffect, useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 
 const darkmode = () => {
   const [darkMode, setDarkMode] = useState(false);
@@ -18,8 +16,8 @@ const darkmode = () => {
 
   // Toggle dark mode on click
   const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
     const newMode = !darkMode;
+    setDarkMode(newMode);
     localStorage.setItem('darkMode', newMode); // Save the preference
     if (newMode) {
       document.documentElement.classList.add('dark');
@@ -27,15 +25,21 @@ const darkmode = () => {
       document.documentElement.classList.remove('dark');
     }
   };
-  
-  return (
-    <>
-          <button onClick={toggleDarkMode} className="bg-blue-600 text-white p-2 rounded-md cursor-pointer ml-[1500px]    px-4 py-2  transition-opacity duration-300 ease-in-out hover:opacity-75  ;">
-          Toggle Dark Mode
-        </button>
-        
-  </>
-  )
-}
 
-export default darkmode
+  return (
+    <div className="absolute top-4 right-4 z-10">
+      {/* Toggle container */}
+      <div
+        onClick={toggleDarkMode}
+        className={`flex items-center cursor-pointer w-14 h-8 rounded-full p-1 transition-all duration-300 ease-in-out ${darkMode ? 'bg-blue-600' : 'bg-gray-300'}`}
+      >
+        {/* Knob */}
+        <div
+          className={`bg-white w-6 h-6 rounded-full transition-transform duration-300 ease-in-out ${darkMode ? 'transform translate-x-6' : ''}`}
+        ></div>
+      </div>
+    </div>
+  );
+};
+
+export default darkmode;
