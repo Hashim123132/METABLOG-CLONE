@@ -22,6 +22,9 @@ import AuthorBio from './PAGES/AuthorBio';
 // Import ProtectedRoute for protected routes
 import ProtectedRoute from './PAGES/ProtectedRoute';
 
+// Import GoogleOAuthProvider
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 // A separate component to handle route transitions
 const RouteTransitions = () => {
   const location = useLocation(); // useLocation hook to track route changes
@@ -64,26 +67,21 @@ const RouteTransitions = () => {
   );
 };
 
-/*************  ✨ Codeium Command ⭐  *************/
-/**
- * The main application component, which wraps the entire app in an
- * AlertState provider, a BrowserRouter, a Darkmode toggle, a Navbar, an
- * Alert component, and a main element containing the RouteTransitions
- * component.
- *
- * @return {React.ReactElement} The rendered app component.
- */
-/******  b6a7c265-07f1-42b9-b70d-3ffcec66fa1a  *******/function App() {
+function App() {
+  const CLIENT_ID = '524342644041-lo41thj2ut0qfs9f93hnvnca1r2hc3ud.apps.googleusercontent.com'; // Replace with your actual Google Client ID
+
   return (
     <AlertState>
-      <BrowserRouter>
-        <Darkmode />
-        <Navbar />
-        <Alert />
-        <main>
-          <RouteTransitions />
-        </main>
-      </BrowserRouter>
+      <GoogleOAuthProvider clientId={CLIENT_ID}> {/* Wrap your app with GoogleOAuthProvider */}
+        <BrowserRouter>
+          <Darkmode />
+          <Navbar />
+          <Alert />
+          <main>
+            <RouteTransitions />
+          </main>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
     </AlertState>
   );
 }

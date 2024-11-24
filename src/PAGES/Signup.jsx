@@ -1,32 +1,43 @@
-import {useNavigate } from 'react-router-dom'; // Import usenavigate
+import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
-import CustomAlert from './CustomAlert';
+import { GoogleLogin } from '@react-oauth/google'; // Import GoogleLogin
+import CustomAlert from './CustomAlert'; // CustomAlert for success/error messages
 
 const Signup = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const navigate = useNavigate();  // Initialize navigate to navigate programmatically
+  const navigate = useNavigate();
 
-  // Handle form submission
+  const handleGoogleSuccess = async (response) => {
+    try {
+      const { credential } = response;
+      const googleResponse = await axios.post('http://localhost:5000/api/auth/google', { token: credential });
+
+      if (googleResponse.data.success) {
+        setSuccessMessage('Google sign-in successful! Redirecting to dashboard...');
+        setTimeout(() => navigate('/dashboard'), 2000);
+      } else {
+        setErrorMessage(googleResponse.data.error || 'Google sign-in failed');
+      }
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
+      setErrorMessage('Error with Google sign-in. Please try again later.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const userData = { name, email, password };
+    const { name, email, password } = formData;
 
     try {
-      // Make POST request to backend to create the user
-      const response = await axios.post('http://localhost:5000/api/auth/createuser', userData);
+      const response = await axios.post('http://localhost:5000/api/auth/createuser', { name, email, password });
 
       if (response.data.success) {
         setSuccessMessage('User created successfully! Redirecting to login...');
-        setTimeout(() => {
-          // Redirect to login page after 2 seconds
-          navigate('/login');
-        }, 2000); // Redirect after 2 seconds
+        setTimeout(() => navigate('/login'), 2000);
       } else {
         setErrorMessage(response.data.error || 'Failed to create user');
       }
@@ -51,8 +62,8 @@ const Signup = () => {
             id="name"
             className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] mt-7"
             placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             name="name"
           />
 
@@ -62,10 +73,9 @@ const Signup = () => {
             id="email"
             className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] mt-7"
             placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             name="email"
-            aria-describedby="emailHelp"
           />
 
           {/* Password Field */}
@@ -73,34 +83,34 @@ const Signup = () => {
             type="password"
             className="rounded-md border-solid border border-[#3B3C4A] text-[#97989F] bg-[#181A2A] block py-[12px] px-[16px] w-[320px] mt-7"
             placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             name="password"
-            id="password"
           />
 
           {/* Submit Button */}
           <button
-            type="submit"
-            className="rounded-md p-2 text-white font-semibold bg-[#4B6BFB] py-[12px] px-[16px] w-[320px] mt-7 transition-opacity duration-300 hover:opacity-80"
+            className="rounded-md p-2 text-white font-semibold bg-[#4B6BFB] py-[12px] px-[16px] w-[320px] mt-2"
           >
             Sign Up
           </button>
 
-          {/* Error or Success Message */}
-          {errorMessage && (
-            <p className="mt-4 text-center text-sm text-red-500">{errorMessage}</p>
-          )}
-          {successMessage && (
-            <CustomAlert
-              message={successMessage}
-              type="success"
-              onClose={() => setSuccessMessage('')}
+          {/* Google Login Button */}
+          <div className="mt-4">
+            <GoogleLogin 
+              onSuccess={handleGoogleSuccess} 
+              onError={() => setErrorMessage('Google sign-in failed')}
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID} 
             />
-          )}
+          </div>
+
+          {/* Alerts */}
+          {successMessage && <CustomAlert message={successMessage} type="success" />}
+          {errorMessage && <CustomAlert message={errorMessage} type="danger" />}
         </div>
       </div>
     </form>
   );
 };
-export default Signup
+
+export default Signup;

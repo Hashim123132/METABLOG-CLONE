@@ -5,32 +5,31 @@ const Contact = () => {
   const [credentials, setCredentials] = useState({email:'', comment:''} )
   const navigate = useNavigate();
   
-  const handleSubmit = async (e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-   
-    const {email, comment} = credentials
-
-    //Sending POST request to create user 
-    const response = await fetch('http://localhost:5000/api/auth2/createcontact', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({email, comment} )
-      
-    });
-    const json = await response.json()
-    if(json.success){
-      navigate('/')
-      alert('Your comment has been sent successfully')
-
+  
+    const { email, comment } = credentials;
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/auth2/createcontact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, comment }),
+      });
+  
+      const json = await response.json();
+      if (json.success) {
+        navigate('/');
+        alert('Your comment has been sent successfully');
+      } else {
+        alert(json.message || 'Invalid credentials');
+      }
+    } catch (error) {
+      alert('There was an error with your request.');
+      console.error('Error submitting comment:', error);
     }
-    else{
-      alert('invalid credentials')
-    }
-    
-    
-    
-   
-  }
+  };
+  
 
   const onChange = (e) =>{
     setCredentials({...credentials, [e.target.name]: e.target.value})

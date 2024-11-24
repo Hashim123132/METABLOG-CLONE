@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const User = require('../middleware/models/User');
-const Blog = require('../middleware/models/Blog');
+const User = require('../models/User');
+const Blog = require('../models/Blog');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // 1. Get User Profile (Authenticated)
