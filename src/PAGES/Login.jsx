@@ -30,7 +30,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch("http://localhost:5000/api/auth/Login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -40,7 +40,7 @@ const Login = () => {
       if (json.success) {
         localStorage.setItem("token", json.authToken);
         showAlert("User logged in successfully", "success");
-        navigate("/Home");
+        navigate("/");
       } else {
         showAlert("Invalid credentials", "danger");
       }
@@ -57,7 +57,7 @@ const Login = () => {
       setLoading(true);
       const googleToken = response.credential;
 
-      const res = await fetch("http://localhost:5000/api/auth/google-login", {
+      const res = await fetch("http://localhost:5000/google-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: googleToken }),
@@ -67,7 +67,7 @@ const Login = () => {
       if (json.success) {
         localStorage.setItem("token", json.authToken);
         showAlert("User logged in successfully via Google", "success");
-        navigate("/Home");
+        navigate("/");
       } else {
         showAlert(`Google login failed: ${json.message || "Unknown error"}`, "danger");
       }

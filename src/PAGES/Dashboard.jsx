@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -60,36 +61,41 @@ const Dashboard = () => {
   }, [navigate]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center text-lg font-semibold py-4">Loading...</div>;
   }
 
   if (errorMessage) {
-    return <div>{errorMessage}</div>;
+    return <div className="text-center text-red-500 font-semibold py-4">{errorMessage}</div>;
   }
 
   if (!user) {
-    return <div>Please log in to access your dashboard.</div>;
+    return <div className="text-center text-lg font-semibold py-4">Please log in to access your dashboard.</div>;
   }
 
   return (
-    <div>
-      <h1>Welcome, {user.name || user.username}</h1>
-      <p>Email: {user.email}</p>
+    <div className="container mx-auto p-4 ">
+      <div className="bg-white dark:bg-custom-dark2 dark:text-white shadow-lg rounded-lg p-6 mb-6">
+        <h1 className="text-3xl font-semibold ">Welcome, {user.name || user.username}</h1>
+        <p className="text-lg dark:text-custom-gray-2">Email: {user.email}</p>
+      </div>
 
-      <h2>Your Blogs</h2>
-      {blogs.length === 0 ? (
-        <p>No blogs found</p>
-      ) : (
-        <ul>
-          {blogs.map((blog) => (
-            <li key={blog._id}>
-              <h3>{blog.title}</h3>
-              <p>{blog.content}</p>
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className='flex flex-col items-center '>
+        <h2 className="text-2xl font-semibold dark:text-white mb-4">Your Blogs</h2>
+        {blogs.length === 0 ? (
+          <p className="text-lg text-gray-600 dark:text-custom-gray-2">No blogs found</p>
+        ) : (
+          <ul className="space-y-4">
+            {blogs.map((blog) => (
+              <li key={blog._id} className="bg-gray-100  p-4 rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold text-gray-700">{blog.title}</h3>
+                <p className="text-gray-600">{blog.content}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
+
 export default Dashboard;

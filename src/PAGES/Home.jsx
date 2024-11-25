@@ -53,7 +53,7 @@ const Home = () => {
       </div>
 
       {/* Latest Posts Section */}
-      <div className='xsm:font-bold text-2xl text-white mt-10 ml-[90px]'>Latest Post</div>
+      <div className='xsm:font-bold text-2xl dark:text-white mt-10 ml-[90px]'>Latest Post</div>
 
       {/* Grid of Blogs */}
       <div className="container mx-auto p-6">

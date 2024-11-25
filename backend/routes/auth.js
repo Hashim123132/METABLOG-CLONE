@@ -1,7 +1,8 @@
-// src/routes/google-auth.js
+// src/routes/auth.js
 
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -19,6 +20,77 @@ const sendErrorResponse = (res, message, status = 500) => {
   console.error(message);
   res.status(status).json({ success: false, message });
 };
+
+// Route for traditional Signup (email/password)
+router.post('/Signup', async (req, res) => {
+  const { email, password, name } = req.body; 
+
+  if (!email || !password || !name) {
+    return sendErrorResponse(res, 'Email, password, and name are required.', 400);
+  }
+
+  try {
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return sendErrorResponse(res, 'User already exists.', 400);
+    }
+
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    user = new User({ email, name, password: hashedPassword });
+    await user.save();
+
+    // Generate a JWT token for the authenticated user
+    const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
+
+    // Send the JWT token back to the frontend
+    res.json({
+      success: true,
+      authToken,
+      message: 'User signed up successfully',
+    });
+  } catch (error) {
+    sendErrorResponse(res, 'Error during Signup', 500);
+  }
+});
+
+// Route for traditional login (email/password)
+router.post('/Login', async (req, res) => {
+  const { email, password } = req.body; // email, password from request
+
+  if (!email || !password) {
+    return sendErrorResponse(res, 'Email and password are required.', 400);
+  }
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return sendErrorResponse(res, 'Invalid email or password.', 400);
+    }
+
+    // Compare the provided password with the stored hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return sendErrorResponse(res, 'Invalid email or password.', 400);
+    }
+
+    // Generate a JWT token for the authenticated user
+    const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
+
+    // Send the JWT token back to the frontend
+    res.json({
+      success: true,
+      authToken,
+      message: 'User logged in successfully',
+    });
+  } catch (error) {
+    sendErrorResponse(res, 'Error during login', 500);
+  }
+});
 
 // Route for Google Login/Signup
 router.post('/google-login', async (req, res) => {
@@ -60,7 +132,7 @@ router.post('/google-login', async (req, res) => {
       message: user.googleId ? 'User logged in with Google' : 'User signed up with Google'
     });
   } catch (error) {
-    sendErrorResponse(res, 'Error during Google login/signup', 500);
+    sendErrorResponse(res, 'Error during Google login/Signup', 500);
   }
 });
 
@@ -73,7 +145,7 @@ router.get('/api/auth/google/callback', async (req, res) => {
   }
 
   try {
-    // Step 1: Exchange authorization code for an access token
+    // Exchange authorization code for an access token
     const tokenUrl = 'https://oauth2.googleapis.com/token';
     const params = {
       code,
@@ -109,7 +181,7 @@ router.get('/api/auth/google/callback', async (req, res) => {
     const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
 
     // Step 5: Redirect back to frontend with the token
-    const redirectUrl ='http://localhost:5173';
+    const redirectUrl = 'http://localhost:5173';
     res.redirect(`${redirectUrl}/?authToken=${authToken}`); // Send the token via query param to frontend
 
   } catch (error) {

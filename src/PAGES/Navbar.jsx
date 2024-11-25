@@ -55,7 +55,7 @@ const Navbar = () => {
                 to="/Signup"
                 role='button'
               >
-                SignUp
+                Signup
               </NavLink>
             </>
           ) : (

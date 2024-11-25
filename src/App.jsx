@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'; // Import useLocation
 import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Import transition group
-import Dashboard from './PAGES/Dashboard';
 import { useEffect } from 'react';
 
 // PAGES
@@ -18,8 +17,9 @@ import AlertState from './Context/Alert/AlertState';
 import Alert from './PAGES/Alert';
 import Darkmode from './PAGES/darkmode';
 import AuthorBio from './PAGES/AuthorBio';
+import Dashboard from './PAGES/Dashboard';
 
-// Import ProtectedRoute for protected routes
+
 import ProtectedRoute from './PAGES/ProtectedRoute';
 
 // Import GoogleOAuthProvider
@@ -60,7 +60,7 @@ const RouteTransitions = () => {
           />
 
           <Route path='/Login' element={<Login />} />
-          <Route path='/Signup' element={<Signup />} />
+          <Route path='/signup' element={<Signup />} />
         </Routes>
       </CSSTransition>
     </TransitionGroup>
@@ -68,7 +68,7 @@ const RouteTransitions = () => {
 };
 
 function App() {
-  const CLIENT_ID = '524342644041-lo41thj2ut0qfs9f93hnvnca1r2hc3ud.apps.googleusercontent.com'; // Replace with your actual Google Client ID
+  const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   return (
     <AlertState>

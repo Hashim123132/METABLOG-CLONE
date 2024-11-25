@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import axios from 'axios';
 import { GoogleLogin } from '@react-oauth/google'; // Import GoogleLogin
 import CustomAlert from './CustomAlert'; // CustomAlert for success/error messages
 
@@ -13,13 +12,20 @@ const Signup = () => {
   const handleGoogleSuccess = async (response) => {
     try {
       const { credential } = response;
-      const googleResponse = await axios.post('http://localhost:5000/api/auth/google', { token: credential });
+      const googleResponse = await fetch('http://localhost:5000/google-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: credential }),
+      });
 
-      if (googleResponse.data.success) {
+      const data = await googleResponse.json();
+      if (data.success) {
         setSuccessMessage('Google sign-in successful! Redirecting to dashboard...');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setTimeout(() => navigate('/'), 2000);
       } else {
-        setErrorMessage(googleResponse.data.error || 'Google sign-in failed');
+        setErrorMessage(data.message || 'Google sign-in failed');
       }
     } catch (error) {
       console.error('Error during Google sign-in:', error);
@@ -29,24 +35,30 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { name, email, password } = formData;
-
+  
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/createuser', { name, email, password });
-
-      if (response.data.success) {
+      const response = await fetch('http://localhost:5000/api/auth/Signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
+  
+      const data = await response.json();
+      if (data.success) {
         setSuccessMessage('User created successfully! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000);
+        setTimeout(() => navigate('/Login'), 2000);
       } else {
-        setErrorMessage(response.data.error || 'Failed to create user');
+        setErrorMessage(data.error || 'Failed to create user');
       }
     } catch (error) {
-      console.error('Error during signup:', error);
+      console.error('Error during Signup:', error);
       setErrorMessage('Error creating user. Please try again later.');
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="flex justify-center items-center h-screen">
@@ -97,10 +109,10 @@ const Signup = () => {
 
           {/* Google Login Button */}
           <div className="mt-4">
-            <GoogleLogin 
-              onSuccess={handleGoogleSuccess} 
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
               onError={() => setErrorMessage('Google sign-in failed')}
-              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID} 
+              clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
             />
           </div>
 
