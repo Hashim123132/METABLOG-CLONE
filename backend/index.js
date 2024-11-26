@@ -2,6 +2,7 @@ require('dotenv').config();
 const connectToMongo = require('./db'); 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 
 
@@ -18,6 +19,7 @@ app.use(express.json()); // Built-in JSON parsing middleware
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/auth2', require('./routes/auth2'));
 app.use('/api/auth3', require('./routes/auth3'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 
