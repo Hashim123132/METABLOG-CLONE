@@ -30,11 +30,11 @@ const Pages = () => {
                       </div>
                   
                   </div>
-                    <div class="text-center mt-6 text-custom-dark ">
-                      <span class="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">Meet Jason Francisco, a passionate writer and blogger with a love for</span>
-                      <span class="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">technology and travel. Jonathan holds a degree in Computer Science and</span>
-                      <span class="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">has spent years working in the tech industry, gaining a deep understanding </span>
-                      <span class="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">of the impact technology has on our lives.</span>
+                    <div className="text-center mt-6 text-custom-dark ">
+                      <span className="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">Meet Jason Francisco, a passionate writer and blogger with a love for</span>
+                      <span className="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">technology and travel. Jonathan holds a degree in Computer Science and</span>
+                      <span className="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">has spent years working in the tech industry, gaining a deep understanding </span>
+                      <span className="xsm:text-xs  block  dark:text-[#BABABF] lg:text-lg">of the impact technology has on our lives.</span>
                     </div>
                     <div className='xsm:flex justify-center items-center space-x-2 mt-2 lg:mt-5'>
                       <div className='bg-gray-300 dark:bg-custom-gray-2 rounded-lg w-[32px] h-[32px]'></div>

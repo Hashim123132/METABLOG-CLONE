@@ -1,59 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react"; // Import useRef
+import { useNavigate, Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [isProfileEditing, setIsProfileEditing] = useState(false); // New state for profile editing
   const [currentBlog, setCurrentBlog] = useState(null);
-  const [newBlog, setNewBlog] = useState({ title: '', content: '', image: null });
+
+  const [hasProfilePic, setHasProfilePic] = useState(!!user?.image);
+
+  const [newBlog, setNewBlog] = useState({
+    title: "",
+    content: "",
+    image: null,
+  });
+  const [updatedProfile, setUpdatedProfile] = useState({ name: "", email: "" }); // New state for profile update
   const navigate = useNavigate();
+  const fileInput = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setErrorMessage('You need to log in first.');
-      navigate('/Login');
+      setErrorMessage("You need to log in first.");
+      navigate("/Login");
       return;
     }
-
-    const storedUser = localStorage.getItem('user');
+  
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const userData = JSON.parse(storedUser);
+      setUser(userData); // Set user data
+      setHasProfilePic(userData.image !== null); // Ensure the profile pic state is correctly set based on userData
     } else {
-      fetch('http://localhost:5000/api/auth3/profile', {
-        method: 'GET',
+      fetch("http://localhost:5000/api/auth3/profile", {
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       })
         .then((response) => response.json())
         .then((json) => {
           if (json.success) {
-            setUser(json.data);
-            localStorage.setItem('user', JSON.stringify(json.data));
+            setUser(json.data); // Set the user data from the API response
+            localStorage.setItem("user", JSON.stringify(json.data)); // Save the user to localStorage
+            setHasProfilePic(json.data.image !== null); // Ensure the profile pic state is updated
           } else {
-            setErrorMessage('Failed to fetch user profile');
+            setErrorMessage("Failed to fetch user profile");
           }
         })
         .catch((error) => {
-          setErrorMessage('Error fetching profile');
+          setErrorMessage("Error fetching profile");
           console.error(error);
         });
     }
-
+  
+    // Fetch blogs after the user is fetched
     fetchBlogs(token);
   }, [navigate]);
+  
 
   const fetchBlogs = (token) => {
-    fetch('http://localhost:5000/api/auth3/blogs', {
-      method: 'GET',
+    fetch("http://localhost:5000/api/auth3/blogs", {
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
     })
       .then((response) => response.json())
@@ -65,25 +80,25 @@ const Dashboard = () => {
         }
       })
       .catch((error) => {
-        setErrorMessage('Error fetching blogs');
+        setErrorMessage("Error fetching blogs");
         console.error(error);
       })
       .finally(() => setLoading(false));
   };
 
   const handleDelete = (id) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setErrorMessage('You need to log in first.');
+      setErrorMessage("You need to log in first.");
       return;
     }
 
-    if (window.confirm('Are you sure you want to delete this blog?')) {
+    if (window.confirm("Are you sure you want to delete this blog?")) {
       fetch(`http://localhost:5000/api/auth3/blogs/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       })
         .then((response) => response.json())
@@ -91,11 +106,11 @@ const Dashboard = () => {
           if (data.success) {
             setBlogs(blogs.filter((blog) => blog._id !== id));
           } else {
-            setErrorMessage('Error deleting blog');
+            setErrorMessage("Error deleting blog");
           }
         })
         .catch((error) => {
-          setErrorMessage('Error deleting blog');
+          setErrorMessage("Error deleting blog");
           console.error(error);
         });
     }
@@ -104,79 +119,91 @@ const Dashboard = () => {
   const handleEdit = (blog) => {
     setIsEditing(true);
     setCurrentBlog(blog);
-    setNewBlog({ title: blog.title, content: blog.content, image: blog.image || null });
+    setNewBlog({
+      title: blog.title,
+      content: blog.content,
+      image: blog.image || null,
+    });
   };
 
   const handleUpdate = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setErrorMessage('You need to log in first.');
+      setErrorMessage("You need to log in first.");
       return;
     }
 
     const formData = new FormData();
-    formData.append('title', newBlog.title);
-    formData.append('content', newBlog.content);
+    formData.append("title", newBlog.title);
+    formData.append("content", newBlog.content);
     if (newBlog.image) {
-      formData.append('image', newBlog.image);
+      formData.append("image", newBlog.image);
     }
 
     fetch(`http://localhost:5000/api/auth3/blogs/${currentBlog._id}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          setBlogs(blogs.map((blog) => (blog._id === currentBlog._id ? data.data : blog)));
+          setBlogs(
+            blogs.map((blog) =>
+              blog._id === currentBlog._id ? data.data : blog
+            )
+          );
           setIsEditing(false);
-          setNewBlog({ title: '', content: '', image: null });
+          setNewBlog({ title: "", content: "", image: null });
           setCurrentBlog(null);
         } else {
-          setErrorMessage('Error updating blog');
+          setErrorMessage("Error updating blog");
         }
       })
       .catch((error) => {
-        setErrorMessage('Error updating blog');
+        setErrorMessage("Error updating blog");
         console.error(error);
       });
   };
 
   const handleCreate = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setErrorMessage('You need to log in first.');
+      setErrorMessage("You need to log in first.");
       return;
     }
 
     const formData = new FormData();
-    formData.append('title', newBlog.title);
-    formData.append('content', newBlog.content);
+    formData.append("title", newBlog.title);
+    formData.append("content", newBlog.content);
     if (newBlog.image) {
-      formData.append('image', newBlog.image);
+      formData.append("image", newBlog.image);
     }
 
-    fetch('http://localhost:5000/api/auth3/blogs', {
-      method: 'POST',
+    fetch("http://localhost:5000/api/auth3/blogs", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
+          // Redirect to the newly created blog's page
+          navigate(`/blogs/${data.data._id}`);
+
+          // Optionally, update the blogs list and reset the form
           setBlogs((prevBlogs) => [data.data, ...prevBlogs]);
-          setNewBlog({ title: '', content: '', image: null });
+          setNewBlog({ title: "", content: "", image: null });
         } else {
-          setErrorMessage('Error creating blog');
+          setErrorMessage("Error creating blog");
         }
       })
       .catch((error) => {
-        setErrorMessage('Error creating blog');
+        setErrorMessage("Error creating blog");
         console.error(error);
       });
   };
@@ -185,27 +212,240 @@ const Dashboard = () => {
     setNewBlog({ ...newBlog, image: e.target.files[0] });
   };
 
+  const handleProfileEditToggle = () => {
+    setIsProfileEditing(!isProfileEditing);
+
+    setUpdatedProfile({ name: user?.name || "", email: user?.email || "" });
+  };
+
+  const handleProfileUpdate = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setErrorMessage("You need to log in first.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", updatedProfile.name);
+    formData.append("email", updatedProfile.email);
+    if (updatedProfile.profilePic) {
+      formData.append("image", updatedProfile.profilePic);
+    }
+
+    fetch(`http://localhost:5000/api/auth3/profile`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setUser(data.data); // Update the user data after successful update
+          localStorage.setItem("user", JSON.stringify(data.data)); // Update localStorage with new data
+          setIsProfileEditing(false); // Close the profile edit form
+          alert("Profile updated successfully!");
+        } else {
+          setErrorMessage("Error updating profile");
+        }
+      })
+      .catch((error) => {
+        setErrorMessage("Error updating profile");
+        console.error(error);
+      });
+  };
+  const handleDeleteProfilePic = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setErrorMessage("You need to log in first.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/auth3/delete-profile-pic",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (response.ok) {
+        // Update user state after successful deletion
+        setUser((prevUser) => {
+          const updatedUser = {
+            ...prevUser,
+            image: null, // Remove the image path from the user object
+          };
+  
+          // Also update the hasProfilePic state
+          setHasProfilePic(false); // No profile picture anymore
+  
+          // Update localStorage with the updated user object
+          localStorage.setItem("user", JSON.stringify(updatedUser)); // Update localStorage
+  
+          return updatedUser; // Return updated user state
+        });
+  
+        alert("Profile picture deleted successfully");
+      } else {
+        alert("Failed to delete profile picture");
+      }
+    } catch (error) {
+      console.error("Error deleting profile picture:", error);
+      alert("An error occurred while deleting the profile picture");
+    }
+  };
+  
+
+  const handleProfilePicChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // You can store the file locally temporarily, or you can immediately upload it to the server
+      setUpdatedProfile({
+        ...updatedProfile,
+        profilePic: file, // Update local state with the selected file
+        profilePicPreview: URL.createObjectURL(file), // Temporary URL for preview
+      });
+    }
+  };
+
   if (loading) {
-    return <div className="text-center text-lg font-semibold py-4">Loading...</div>;
+    return (
+      <div className="text-center text-lg font-semibold py-4">Loading...</div>
+    );
   }
 
   if (errorMessage) {
-    return <div className="text-center text-red-500 font-semibold py-4">{errorMessage}</div>;
+    return (
+      <div className="text-center text-red-500 font-semibold py-4">
+        {errorMessage}
+      </div>
+    );
   }
 
   if (!user) {
-    return <div className="text-center text-lg font-semibold py-4">Please log in to access your dashboard.</div>;
+    return (
+      <div className="text-center text-lg font-semibold py-4">
+        Please log in to access your dashboard.
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto p-4">
-      <div className="bg-white dark:bg-custom-dark2 dark:text-white shadow-lg rounded-lg p-6 mb-6">
-        <h1 className="text-3xl font-semibold">Welcome, {user.name || user.username}</h1>
-        <p className="text-lg dark:text-custom-gray-2">Email: {user.email}</p>
+      <div className="bg-white dark:bg-custom-dark2 dark:text-white shadow-lg rounded-lg p-6 mb-6 ">
+        <div className="relative">
+          <h1 className="text-3xl font-semibold">
+            Welcome, {user.name || user.username}
+          </h1>
+          <p className="text-lg dark:text-custom-gray-2">Email: {user.email}</p>
+
+          {/* Conditionally render the profile picture */}
+          <div className="absolute top-0 right-0 mt-2 mr-2">
+            {updatedProfile.profilePicPreview ? (
+              <img
+                src={updatedProfile.profilePicPreview}
+                alt="Profile picture preview"
+                className="w-16 h-16 rounded-full object-cover"
+              />
+            ) : hasProfilePic && user.image ? (
+              // Display profile picture from user state if exists
+              <img
+                src={`http://localhost:5000${
+                  user.image
+                }?${new Date().getTime()}`} // Cache busting using timestamp
+                alt="User profile picture"
+                className="w-16 h-16 rounded-full object-cover"
+              />
+            ) : (
+              <img
+                src="/IMAGES/default-author.png"
+                alt="Default profile picture"
+                className="w-16 h-16 rounded-full object-cover"
+              />
+            )}
+          </div>
+
+          {/* Delete Profile Picture Button */}
+          {user.image && (
+            <button
+              onClick={handleDeleteProfilePic}
+              className="text-red-500 mt-2"
+            >
+              Delete Profile Picture
+            </button>
+          )}
+        </div>
+
+        {/* Profile Edit Button */}
+        <button
+          onClick={handleProfileEditToggle}
+          className="bg-blue-500 text-white p-2 rounded mt-4 transition-all duration-300 ease-in-out transform hover:scale-105"
+        >
+          Edit Profile
+        </button>
+
+        {/* Profile Edit Form (condition rendering) */}
+        {isProfileEditing && (
+          <div className="mt-4 ">
+            {/* Name Input */}
+            <input
+              type="text"
+              placeholder="Name"
+              value={updatedProfile.name}
+              onChange={(e) =>
+                setUpdatedProfile({ ...updatedProfile, name: e.target.value })
+              }
+              className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+            />
+
+            {/* Email Input */}
+            <input
+              type="email"
+              placeholder="Email"
+              value={updatedProfile.email}
+              onChange={(e) =>
+                setUpdatedProfile({ ...updatedProfile, email: e.target.value })
+              }
+              className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+            />
+
+            {/* Profile Picture Input */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleProfilePicChange}
+              className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+            />
+
+            {/* Update Button */}
+            <button
+              onClick={handleProfileUpdate}
+              className="bg-green-500 text-white p-2 rounded mt-2"
+            >
+              Update Profile
+            </button>
+
+            {/* Cancel Button */}
+            <button
+              onClick={handleProfileEditToggle}
+              className="bg-gray-500 text-white p-2 rounded mt-2 ml-2"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col items-center">
-        <h2 className="text-2xl font-semibold dark:text-white mb-4">Your Blogs</h2>
+        <h2 className="text-2xl font-semibold dark:text-white mb-4">
+          Your Blogs
+        </h2>
 
         {/* Blog Creation Form */}
         <div className="mb-6">
@@ -220,7 +460,9 @@ const Dashboard = () => {
           <textarea
             placeholder="Content"
             value={newBlog.content}
-            onChange={(e) => setNewBlog({ ...newBlog, content: e.target.value })}
+            onChange={(e) =>
+              setNewBlog({ ...newBlog, content: e.target.value })
+            }
             className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
             rows="4"
           />
@@ -230,22 +472,34 @@ const Dashboard = () => {
             onChange={handleImageChange}
             className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
           />
-          <button onClick={handleCreate} className="bg-blue-500 text-white p-2 rounded mt-2">Create Blog</button>
+          <button
+            onClick={handleCreate}
+            className="bg-blue-500 text-white p-2 rounded mt-2"
+          >
+            Create Blog
+          </button>
         </div>
 
         {/* Blog List */}
         <div className="grid grid-cols-3 gap-1 w-full">
           {blogs.length > 0 ? (
             blogs.map((blog) => (
-              <div key={blog._id} className="bg-white dark:bg-custom-dark2 dark:border dark:border-custom-gray-2 shadow-lg rounded-xl p-4 mb-4 h-[550px] w-[450px]">
-                {blog.image && (
-                  <img
-                    src={`http://localhost:5000${blog.image}`}
-                    alt={blog.title}
-                    className="mt-2 w-full h-64 object-cover rounded-lg"
-                  />
-                )}
-                <h3 className="text-3xl font-semibold dark:text-white">{blog.title}</h3>
+              <div
+                key={blog._id}
+                className="bg-white dark:bg-custom-dark2 dark:border dark:border-custom-gray-2 shadow-lg rounded-xl p-4 mb-4 h-[550px] w-[450px]"
+              >
+                <Link to={`/blogs/${blog._id}`}>
+                  {blog.image && (
+                    <img
+                      src={`http://localhost:5000${blog.image}`}
+                      alt={blog.title}
+                      className="mt-2 w-full h-64 object-cover rounded-lg"
+                    />
+                  )}
+                  <h3 className="text-3xl font-semibold dark:text-white">
+                    {blog.title}
+                  </h3>
+                </Link>
                 <p className="text-sm dark:text-white">{blog.content}</p>
                 <div className="flex justify-end mt-2">
                   <button
@@ -264,10 +518,53 @@ const Dashboard = () => {
               </div>
             ))
           ) : (
-            <p>No blogs available</p>
+            <div className="text-center text-lg font-semibold py-4">
+              No blogs found.
+            </div>
           )}
         </div>
       </div>
+
+      {/* Blog Edit Form */}
+      {isEditing && (
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold">Edit Blog</h3>
+          <input
+            type="text"
+            placeholder="Title"
+            value={newBlog.title}
+            onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
+            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+          />
+          <textarea
+            placeholder="Content"
+            value={newBlog.content}
+            onChange={(e) =>
+              setNewBlog({ ...newBlog, content: e.target.value })
+            }
+            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
+            rows="4"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+          />
+          <button
+            onClick={handleUpdate}
+            className="bg-green-500 text-white p-2 rounded mt-2"
+          >
+            Update Blog
+          </button>
+          <button
+            onClick={() => setIsEditing(false)}
+            className="bg-gray-500 text-white p-2 rounded mt-2 ml-2"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect,useRef } from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'; // Import useLocation
 import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Import transition group
-import { useEffect } from 'react';
 
 // PAGES
 import Home from './PAGES/Home';
@@ -18,9 +17,9 @@ import Alert from './PAGES/Alert';
 import Darkmode from './PAGES/darkmode';
 import AuthorBio from './PAGES/AuthorBio';
 import Dashboard from './PAGES/Dashboard';
+import BlogDetail2 from './PAGES/blogdetail2';  // Import the new BlogDetail2 component
 
-
-import ProtectedRoute from './PAGES/ProtectedRoute';
+import ProtectedRoute from './PAGES/ProtectedRoute'; // Import ProtectedRoute for protecting the Dashboard
 
 // Import GoogleOAuthProvider
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -28,10 +27,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // A separate component to handle route transitions
 const RouteTransitions = () => {
   const location = useLocation(); // useLocation hook to track route changes
-
   // Scroll to top on route change
   useEffect(() => {
-    window.scrollTo(0, 0); // Scroll to the top of the page
+    window.scrollTo(0, 0); // Scroll to the top of the page on route change
   }, [location]); // Dependency on location to trigger on route change
 
   return (
@@ -40,12 +38,21 @@ const RouteTransitions = () => {
         key={location.key} // Ensure unique transition key for each route change
         timeout={500} // Duration of transition
         classNames="parallax" // Use the class names for the CSS transition
+
       >
         <Routes location={location}>
           <Route index element={<Home />} />
           <Route path='/SinglePost' element={<SinglePost />} />
-          <Route path='/blog/:id' element={<BlogDetail />} />
+          
+          {/* Routes for blog details */}
+          
+          <Route path='/blog/:id' element={<BlogDetail />} /> 
+          <Route path='/blogs/:id' element={<BlogDetail2 />} /> 
+
+          {/* Author Bio page */}
           <Route path="/author/:authorName" element={<AuthorBio />} />
+
+          {/* Static Pages */}
           <Route path='/Pages' element={<Pages />} />
           <Route path='/Contact' element={<Contact />} />
 
@@ -59,6 +66,7 @@ const RouteTransitions = () => {
             }
           />
 
+          {/* Auth Routes */}
           <Route path='/Login' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
         </Routes>

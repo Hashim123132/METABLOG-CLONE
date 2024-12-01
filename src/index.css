@@ -9,7 +9,6 @@
 *{
   @apply transition-colors duration-100
 }
-/* Parallax Transition */
 .parallax-enter {
   transform: translateY(50px);
   opacity: 0;

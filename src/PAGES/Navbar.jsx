@@ -21,7 +21,6 @@ const Navbar = () => {
           <div>
             <ul className='xsm:flex justify-around space-x-7 lg: flex items-center ml-10 mt-[5px]'>
               <li><NavLink to='/'>Home</NavLink></li>
-              <li><NavLink to='/Blog'>Blog</NavLink></li>
               <li><NavLink to='/SinglePost'>Single Post</NavLink></li>
               <li><NavLink to='/Pages'>Pages</NavLink></li>
               <li><NavLink to='/Contact'>Contact</NavLink></li>
