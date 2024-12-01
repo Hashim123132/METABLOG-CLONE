@@ -12,7 +12,8 @@ const Signup = () => {
   const handleGoogleSuccess = async (response) => {
     try {
       const { credential } = response;
-      const googleResponse = await fetch('http://localhost:5000/google-login', {
+      
+      const googleResponse = await fetch('http://localhost:5000/api/auth/google-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

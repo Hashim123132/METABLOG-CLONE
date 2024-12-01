@@ -174,14 +174,14 @@ const Dashboard = () => {
       setErrorMessage("You need to log in first.");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append("title", newBlog.title);
     formData.append("content", newBlog.content);
     if (newBlog.image) {
       formData.append("image", newBlog.image);
     }
-
+  
     fetch("http://localhost:5000/api/auth3/blogs", {
       method: "POST",
       headers: {
@@ -192,11 +192,10 @@ const Dashboard = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          // Redirect to the newly created blog's page
-          navigate(`/blogs/${data.data._id}`);
-
-          // Optionally, update the blogs list and reset the form
+          // Update the blogs list with the new blog without redirecting
           setBlogs((prevBlogs) => [data.data, ...prevBlogs]);
+  
+          // Reset the newBlog state to clear the form
           setNewBlog({ title: "", content: "", image: null });
         } else {
           setErrorMessage("Error creating blog");
@@ -446,38 +445,84 @@ const Dashboard = () => {
         <h2 className="text-2xl font-semibold dark:text-white mb-4">
           Your Blogs
         </h2>
+        
+        <div className="flex flex-wrap  space-x-4">
 
-        {/* Blog Creation Form */}
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold">Create a New Blog</h3>
-          <input
-            type="text"
-            placeholder="Title"
-            value={newBlog.title}
-            onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
-            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
-          />
-          <textarea
-            placeholder="Content"
-            value={newBlog.content}
-            onChange={(e) =>
-              setNewBlog({ ...newBlog, content: e.target.value })
-            }
-            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
-            rows="4"
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
-          />
-          <button
-            onClick={handleCreate}
-            className="bg-blue-500 text-white p-2 rounded mt-2"
-          >
-            Create Blog
-          </button>
+
+          {/* Blog Creation Form */}
+          <div className="mb-6 p-4 border rounded-lg shadow-lg w-full max-w-lg mx-auto">
+            <h3 className="text-xl font-semibold mb-4">Create a New Blog</h3>
+            <input
+              type="text"
+              placeholder="Title"
+              value={newBlog.title}
+              onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
+              className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+            />
+            <textarea
+              placeholder="Content"
+              value={newBlog.content}
+              onChange={(e) =>
+                setNewBlog({ ...newBlog, content: e.target.value })
+              }
+              className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
+              rows="4"
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+            />
+            <button
+              onClick={handleCreate}
+              className="bg-blue-500 text-white p-3 rounded mt-2 w-full"
+            >
+              Create Blog
+            </button>
+          </div>
+
+          {/* Blog Edit Form */}
+          {isEditing && (
+            <div className="mb-6 p-4 border rounded-lg shadow-lg w-full max-w-lg mx-auto">
+              <h3 className="text-xl font-semibold mb-4">Edit Blog</h3>
+              <input
+                type="text"
+                placeholder="Title"
+                value={newBlog.title}
+                onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
+                className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+              />
+              <textarea
+                placeholder="Content"
+                value={newBlog.content}
+                onChange={(e) =>
+                  setNewBlog({ ...newBlog, content: e.target.value })
+                }
+                className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
+                rows="4"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+              />
+              <button
+                onClick={handleUpdate}
+                className="bg-green-500 text-white p-3 rounded mt-2 w-full"
+              >
+                Update Blog
+              </button>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="bg-gray-500 text-white p-3 rounded mt-2 w-full"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
         </div>
 
         {/* Blog List */}
@@ -525,46 +570,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Blog Edit Form */}
-      {isEditing && (
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold">Edit Blog</h3>
-          <input
-            type="text"
-            placeholder="Title"
-            value={newBlog.title}
-            onChange={(e) => setNewBlog({ ...newBlog, title: e.target.value })}
-            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
-          />
-          <textarea
-            placeholder="Content"
-            value={newBlog.content}
-            onChange={(e) =>
-              setNewBlog({ ...newBlog, content: e.target.value })
-            }
-            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
-            rows="4"
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
-          />
-          <button
-            onClick={handleUpdate}
-            className="bg-green-500 text-white p-2 rounded mt-2"
-          >
-            Update Blog
-          </button>
-          <button
-            onClick={() => setIsEditing(false)}
-            className="bg-gray-500 text-white p-2 rounded mt-2 ml-2"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+    
     </div>
   );
 };

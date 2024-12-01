@@ -11,69 +11,71 @@ const Login = () => {
   const navigate = useNavigate();
 
   // Check if the user is already logged in on mount or token change
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      setIsLoggedIn(!!token); // Update state based on token existence
-      if (token) {
-        navigate("/"); // Redirect to home if already logged in
-      }
-    }, [navigate]); // Run on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token); // Update state based on token existence
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-    
-      const { email, password } = credentials;
-    
-      if (!email || !password) {
-        showAlert("Please fill in all fields", "danger");
-        setLoading(false);
-        return;
+    if (token) {
+      navigate("/"); // Redirect to the home page if already logged in
+    }
+  }, [navigate]); // Run only once when the component mounts
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const { email, password } = credentials;
+
+    if (!email || !password) {
+      showAlert("Please fill in all fields", "danger");
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      showAlert("Invalid email format", "warning");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/Login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const json = await response.json();
+      if (json.success && json.authToken) {
+        localStorage.setItem("token", json.authToken);
+        setIsLoggedIn(true); // Update state to reflect user is logged in
+        showAlert("User logged in successfully", "success");
+        navigate("/"); // Navigate to the home page
+      } else {
+        showAlert("Invalid credentials", "danger");
       }
-    
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        showAlert("Invalid email format", "warning");
-        setLoading(false);
-        return;
-      }
-    
-      try {
-        const response = await fetch("http://localhost:5000/api/auth/Login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-    
-        const json = await response.json();
-        if (json.success && json.authToken) {
-          localStorage.setItem("token", json.authToken);
-          setIsLoggedIn(true); // Update state to reflect user is logged in
-          showAlert("User logged in successfully", "success");
-          navigate("/"); // Navigate to the home page
-        } else {
-          showAlert("Invalid credentials", "danger");
-        }
-      } catch (error) {
-        console.error("Login error:", error);
-        showAlert("Error logging in", "danger");
-      } finally {
-        setLoading(false);
-      }
-    };
-    const handleLogout = () => {
-      localStorage.removeItem("token"); // Remove token from localStorage
-      setIsLoggedIn(false); // Update state to reflect logout
-      showAlert("Logged out successfully", "success");
-      navigate("/Login"); // Redirect to login page
-    };
+    } catch (error) {
+      console.error("Login error:", error);
+      showAlert("Error logging in", "danger");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token from localStorage
+    setIsLoggedIn(false); // Update state to reflect logout
+    showAlert("Logged out successfully", "success");
+    navigate("/Login"); // Redirect to login page
+  };
 
   const handleGoogleLogin = async (response) => {
     try {
       setLoading(true);
       const googleToken = response.credential;
 
-      const res = await fetch("http://localhost:5000/google-login", {
+      const res = await fetch("http://localhost:5000/api/auth/google-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: googleToken }),
@@ -96,8 +98,6 @@ const Login = () => {
     }
   };
 
-  
-
   return (
     <div>
       <div className="flex justify-center items-center h-screen">
@@ -107,7 +107,7 @@ const Login = () => {
             <>
               <h1 className="font-semibold text-white text-[20px]">Login</h1>
               <p className="font-[#97989F] font-normal text-[#97989F] text-[20px]">Welcome Back!</p>
-  
+
               <form onSubmit={handleSubmit} noValidate>
                 <input
                   type="email"
@@ -132,7 +132,7 @@ const Login = () => {
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
-  
+
                 <div className="mt-4">
                   <GoogleLogin
                     onSuccess={handleGoogleLogin}
