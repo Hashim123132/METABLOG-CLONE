@@ -9,22 +9,29 @@ const Signup = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
-  const handleGoogleSuccess = async (response) => {
+const handleGoogleSuccess = async (response) => {
     try {
-      const { credential } = response;
-      
+      const { credential } = response; // Get the Google token
+
+      // Send the Google token to the backend for authentication
       const googleResponse = await fetch('http://localhost:5000/api/auth/google-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token: credential }),
+        body: JSON.stringify({ token: credential }), // Send token to backend
       });
 
       const data = await googleResponse.json();
+
       if (data.success) {
-        setSuccessMessage('Google sign-in successful! Redirecting to dashboard...');
-        setTimeout(() => navigate('/'), 2000);
+        // Store the token in localStorage to authenticate the user
+        localStorage.setItem('token', data.token);
+        setSuccessMessage('Google sign-in successful! Redirecting to Dashboard...');
+        // Redirect to the Dashboard page after successful login
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 2000);
       } else {
         setErrorMessage(data.message || 'Google sign-in failed');
       }
@@ -37,7 +44,20 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password } = formData;
-  
+
+    // Client-side validation
+    if (!name || !email || !password) {
+      setErrorMessage('All fields are required');
+      return;
+    }
+
+    // Basic email format validation
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailPattern.test(email)) {
+      setErrorMessage('Please enter a valid email address');
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:5000/api/auth/Signup', {
         method: 'POST',
@@ -46,11 +66,11 @@ const Signup = () => {
         },
         body: JSON.stringify({ name, email, password }),
       });
-  
+
       const data = await response.json();
       if (data.success) {
         setSuccessMessage('User created successfully! Redirecting to login...');
-        setTimeout(() => navigate('/Login'), 2000);
+        setTimeout(() => navigate('/Login'), 2000); // Redirect to login after success
       } else {
         setErrorMessage(data.error || 'Failed to create user');
       }
@@ -59,7 +79,13 @@ const Signup = () => {
       setErrorMessage('Error creating user. Please try again later.');
     }
   };
-  
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="flex justify-center items-center h-screen">

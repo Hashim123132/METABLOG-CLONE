@@ -9,6 +9,7 @@ const Dashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isProfileEditing, setIsProfileEditing] = useState(false); // New state for profile editing
   const [currentBlog, setCurrentBlog] = useState(null);
+  const [profilePicPreview, setProfilePicPreview] = useState(null);
 
   const [hasProfilePic, setHasProfilePic] = useState(!!user?.image);
 
@@ -185,9 +186,9 @@ const Dashboard = () => {
     fetch("http://localhost:5000/api/auth3/blogs", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`, // Ensure the token is being sent correctly
       },
-      body: formData,
+      body: formData, // `body` should be the formData
     })
       .then((response) => response.json())
       .then((data) => {
@@ -206,6 +207,7 @@ const Dashboard = () => {
         console.error(error);
       });
   };
+  
 
   const handleImageChange = (e) => {
     setNewBlog({ ...newBlog, image: e.target.files[0] });
@@ -216,21 +218,26 @@ const Dashboard = () => {
 
     setUpdatedProfile({ name: user?.name || "", email: user?.email || "" });
   };
-
   const handleProfileUpdate = () => {
     const token = localStorage.getItem("token");
     if (!token) {
       setErrorMessage("You need to log in first.");
       return;
     }
-
+  
+    // Check if the user logged in with Google
+    const isGoogleUser = user?.googleId; // Assume googleId exists if user logged in with Google
+  
     const formData = new FormData();
-    formData.append("name", updatedProfile.name);
-    formData.append("email", updatedProfile.email);
+  
+    if (!isGoogleUser) {
+      formData.append("name", updatedProfile.name);
+      formData.append("email", updatedProfile.email);
+    }
+  
     if (updatedProfile.profilePic) {
       formData.append("image", updatedProfile.profilePic);
     }
-
     fetch(`http://localhost:5000/api/auth3/profile`, {
       method: "PUT",
       headers: {
@@ -241,9 +248,10 @@ const Dashboard = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          setUser(data.data); // Update the user data after successful update
-          localStorage.setItem("user", JSON.stringify(data.data)); // Update localStorage with new data
-          setIsProfileEditing(false); // Close the profile edit form
+          setUser(data.data); 
+          localStorage.setItem("user", JSON.stringify(data.data)); 
+          setHasProfilePic(data.data.image !== null); 
+          setIsProfileEditing(false); 
           alert("Profile updated successfully!");
         } else {
           setErrorMessage("Error updating profile");
@@ -254,6 +262,9 @@ const Dashboard = () => {
         console.error(error);
       });
   };
+  
+  
+  
   const handleDeleteProfilePic = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -274,20 +285,16 @@ const Dashboard = () => {
       );
   
       if (response.ok) {
-        // Update user state after successful deletion
         setUser((prevUser) => {
           const updatedUser = {
             ...prevUser,
             image: null, // Remove the image path from the user object
           };
   
-          // Also update the hasProfilePic state
           setHasProfilePic(false); // No profile picture anymore
-  
-          // Update localStorage with the updated user object
           localStorage.setItem("user", JSON.stringify(updatedUser)); // Update localStorage
   
-          return updatedUser; // Return updated user state
+          return updatedUser;
         });
   
         alert("Profile picture deleted successfully");
@@ -304,12 +311,11 @@ const Dashboard = () => {
   const handleProfilePicChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // You can store the file locally temporarily, or you can immediately upload it to the server
       setUpdatedProfile({
         ...updatedProfile,
-        profilePic: file, // Update local state with the selected file
-        profilePicPreview: URL.createObjectURL(file), // Temporary URL for preview
+        profilePic: file,
       });
+      setProfilePicPreview(URL.createObjectURL(file)); // This will be used for preview purposes
     }
   };
 
@@ -334,83 +340,84 @@ const Dashboard = () => {
       </div>
     );
   }
+  
+
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="bg-white dark:bg-custom-dark2 dark:text-white shadow-lg rounded-lg p-6 mb-6 ">
-        <div className="relative">
-          <h1 className="text-3xl font-semibold">
-            Welcome, {user.name || user.username}
-          </h1>
-          <p className="text-lg dark:text-custom-gray-2">Email: {user.email}</p>
+      <div className="container mx-auto p-4">
+        <div className="bg-white dark:bg-custom-dark2 dark:text-white shadow-lg rounded-lg p-6 mb-6 ">
+          <div className="relative">
+            <h1 className="text-3xl font-semibold">
+              Welcome, {user.name || user.username}
+            </h1>
+            <p className="text-lg dark:text-custom-gray-2">Email: {user.email}</p>
 
-          {/* Conditionally render the profile picture */}
-          <div className="absolute top-0 right-0 mt-2 mr-2">
-            {updatedProfile.profilePicPreview ? (
-              <img
-                src={updatedProfile.profilePicPreview}
-                alt="Profile picture preview"
-                className="w-16 h-16 rounded-full object-cover"
-              />
-            ) : hasProfilePic && user.image ? (
-              // Display profile picture from user state if exists
-              <img
-                src={`http://localhost:5000${
-                  user.image
-                }?${new Date().getTime()}`} // Cache busting using timestamp
-                alt="User profile picture"
-                className="w-16 h-16 rounded-full object-cover"
-              />
-            ) : (
-              <img
-                src="/IMAGES/default-author.png"
-                alt="Default profile picture"
-                className="w-16 h-16 rounded-full object-cover"
-              />
+            {/* Conditionally render the profile picture */}
+            <div className="absolute top-0 right-0 mt-2 mr-2">
+              {updatedProfile.profilePicPreview ? (
+                <img
+                  src={updatedProfile.profilePicPreview}
+                  alt="Profile picture preview"
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              ) : hasProfilePic && user.image ? (
+                // Display profile picture from user state if exists
+                <img
+                  src={`http://localhost:5000${
+                    user.image
+                  }?${new Date().getTime()}`} // Cache busting using timestamp
+                  alt="User profile picture"
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              ) : (
+                <img
+                  src="/IMAGES/default-author.png"
+                  alt="Default profile picture"
+                  className="w-16 h-16 rounded-full object-cover"
+                />
+              )}
+            </div>
+
+            {/* Delete Profile Picture Button */}
+            {user.image && (
+              <button
+                onClick={handleDeleteProfilePic}
+                className="text-red-500 mt-2"
+              >
+                Delete Profile Picture
+              </button>
             )}
           </div>
 
-          {/* Delete Profile Picture Button */}
-          {user.image && (
-            <button
-              onClick={handleDeleteProfilePic}
-              className="text-red-500 mt-2"
-            >
-              Delete Profile Picture
-            </button>
-          )}
-        </div>
+          {/* Profile Edit Button */}
+          <button
+            onClick={handleProfileEditToggle}
+            className="bg-blue-500 text-white p-2 rounded mt-4 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Edit Profile
+          </button>
+         
 
-        {/* Profile Edit Button */}
-        <button
-          onClick={handleProfileEditToggle}
-          className="bg-blue-500 text-white p-2 rounded mt-4 transition-all duration-300 ease-in-out transform hover:scale-105"
-        >
-          Edit Profile
-        </button>
+          {/* Profile Edit Form (condition rendering) */}
+          {isProfileEditing && (
+            <div className="mt-4 ">
+              {/* Name Input */}
+              <input
+                type="text"
+                placeholder="Name"
+                value={updatedProfile.name}
+                onChange={(e) => setUpdatedProfile({ ...updatedProfile, name: e.target.value })}
 
-        {/* Profile Edit Form (condition rendering) */}
-        {isProfileEditing && (
-          <div className="mt-4 ">
-            {/* Name Input */}
-            <input
-              type="text"
-              placeholder="Name"
-              value={updatedProfile.name}
-              onChange={(e) =>
-                setUpdatedProfile({ ...updatedProfile, name: e.target.value })
-              }
-              className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
-            />
+                className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
+              />
 
             {/* Email Input */}
             <input
               type="email"
               placeholder="Email"
               value={updatedProfile.email}
-              onChange={(e) =>
-                setUpdatedProfile({ ...updatedProfile, email: e.target.value })
-              }
+              onChange={(e) => setUpdatedProfile({ ...updatedProfile, email: e.target.value })}
+
               className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
             />
 
@@ -421,6 +428,7 @@ const Dashboard = () => {
               onChange={handleProfilePicChange}
               className="border p-2 rounded mb-2 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2"
             />
+           
 
             {/* Update Button */}
             <button

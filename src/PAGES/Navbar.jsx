@@ -1,10 +1,23 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();  // Initialize the navigate function from react-router
+
   // Check if the user is authenticated
   const isAuthenticated = () => {
     return localStorage.getItem('token') !== null; // User is authenticated if token exists
+  };
+
+  const handleLogout = () => {
+    // Remove token from localStorage on logout
+    localStorage.removeItem('token');
+    
+    // Optionally, you can also remove other user data if necessary
+    localStorage.removeItem('user');
+    
+    // Navigate to the Login page after logout
+    navigate('/Login');
   };
 
   return (
@@ -19,12 +32,11 @@ const Navbar = () => {
           </div>
 
           <div>
-            <ul className='xsm:flex justify-around space-x-7 lg: flex items-center ml-10 mt-[5px]'>
+            <ul className='xsm:flex justify-around space-x-7 lg:flex items-center ml-10 mt-[5px]'>
               <li><NavLink to='/'>Home</NavLink></li>
               <li><NavLink to='/SinglePost'>Single Post</NavLink></li>
               <li><NavLink to='/Pages'>Pages</NavLink></li>
               <li><NavLink to='/Contact'>Contact</NavLink></li>
-
               <li><NavLink to='/Dashboard'>Dashboard</NavLink></li>
             </ul>
           </div>
@@ -58,15 +70,12 @@ const Navbar = () => {
               </NavLink>
             </>
           ) : (
-            // Optionally add a Logout button if the user is authenticated
+            // Show Logout button if the user is authenticated
             <NavLink
               className="mx-2 px-[20px] py-[10px] rounded-md bg-[#4B6BFB] transition-opacity duration-300 hover:opacity-80 text-white"
               to="/Login"
               role='button'
-              onClick={() => {
-                localStorage.removeItem('token'); // Remove the token on logout
-                window.location.reload(); // Refresh the page to reflect logout
-              }}
+              onClick={handleLogout}  // Call handleLogout on click
             >
               Logout
             </NavLink>

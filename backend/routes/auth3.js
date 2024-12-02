@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const Blog = require('../models/Blog');
 const authMiddleware = require('../middleware/authMiddleware');
+const googleAuthMiddleware = require('../middleware/googleAuthMiddleware');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -75,8 +76,6 @@ router.get('/dashboard', authMiddleware, (req, res) => {
 
 // 3. Update User Profile who currently exists in db (Authenticated)
 router.put('/profile', authMiddleware, upload, [
-  
-  
   // Validation rules for name and email
   body('name').not().isEmpty().withMessage('Name is required'),
   body('email')
@@ -86,7 +85,6 @@ router.put('/profile', authMiddleware, upload, [
       if (existingUser && existingUser.id !== req.user.id) {
         throw new Error('Email is already taken');
       }
-      
       return true;
     })
 ], async (req, res) => {
@@ -100,7 +98,7 @@ router.put('/profile', authMiddleware, upload, [
   }
 
   const { name, email } = req.body;
-  const image = req.file ? `/uploads/${req.file.filename}` : null;  // Save image path if uploaded
+  const image = req.file ? `/uploads/${req.file.filename}` : null;  // Fixing the path syntax
 
   try {
     // Update the user
@@ -129,9 +127,67 @@ router.put('/profile', authMiddleware, upload, [
     });
   } catch (error) {
     // Generic error handler
-    handleError(res, error);
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
   }
 });
+
+// 3. Route to update profile for Google authenticated users
+router.put('/google/profile', googleAuthMiddleware, [
+  // Validation for email (to ensure email is in the right format)
+  body('name').not().isEmpty().withMessage('Name is required'),
+  body('email')
+    .isEmail().withMessage('A valid email is required')
+    .custom(async (value, { req }) => {
+      const existingUser = await User.findOne({ email: value });
+      if (existingUser && existingUser.id !== req.user.id) {
+        throw new Error('Email is already taken');
+      }
+      return true;
+    }),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      success: false,
+      errors: errors.array(),
+    });
+  }
+
+  const { name, email } = req.body;
+
+  try {
+    // Find the user by Google ID (from req.user)
+    const updatedUser = await User.findOneAndUpdate(
+      { googleId: req.user.id },
+      { name, email },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    // Send back the updated user data
+    res.json({
+      success: true,
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+    });
+  }
+});
+
 // delete profile pic from database
 
 router.delete('/delete-profile-pic', authMiddleware, async (req, res) => {

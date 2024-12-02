@@ -13,7 +13,7 @@ require('dotenv').config(); // Ensure .env is loaded
 
 // Google OAuth2 Client Setup using environment variables
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const JWT_SECRET = process.env.JWT_SECRET || '12345'; // Fallback JWT secret
+const JWT_SECRET = process.env.JWT_SECRET || ''; // Fallback JWT secret
 
 // Error response helper
 const sendErrorResponse = (res, message, status = 500) => {
@@ -21,7 +21,7 @@ const sendErrorResponse = (res, message, status = 500) => {
   res.status(status).json({ success: false, message });
 };
 
-// Route for traditional Signup (email/password)
+// Route for traditional Signup (email/password, name)
 router.post('/Signup', async (req, res) => {
   const { email, password, name } = req.body; 
 

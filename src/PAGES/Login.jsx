@@ -20,40 +20,26 @@ const Login = () => {
     }
   }, [navigate]); // Run only once when the component mounts
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const { email, password } = credentials;
-
-    if (!email || !password) {
-      showAlert("Please fill in all fields", "danger");
-      setLoading(false);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      showAlert("Invalid email format", "warning");
-      setLoading(false);
-      return;
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true); // Set loading to true while request is being processed
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/Login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(credentials),
       });
 
       const json = await response.json();
-      if (json.success && json.authToken) {
+
+      if (response.ok && json.success && json.authToken) {
         localStorage.setItem("token", json.authToken);
         setIsLoggedIn(true); // Update state to reflect user is logged in
         showAlert("User logged in successfully", "success");
         navigate("/"); // Navigate to the home page
       } else {
-        showAlert("Invalid credentials", "danger");
+        showAlert(json.message || "Invalid credentials", "danger");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -63,12 +49,8 @@ const Login = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove token from localStorage
-    setIsLoggedIn(false); // Update state to reflect logout
-    showAlert("Logged out successfully", "success");
-    navigate("/Login"); // Redirect to login page
-  };
+
+  
 
   const handleGoogleLogin = async (response) => {
     try {
@@ -98,6 +80,14 @@ const Login = () => {
     }
   };
 
+  // Handle input changes for email and password
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials((prevCredentials) => ({
+      ...prevCredentials,
+      [name]: value,
+    }));
+  };
   return (
     <div>
       <div className="flex justify-center items-center h-screen">
@@ -146,12 +136,7 @@ const Login = () => {
             <div className="flex flex-col justify-center items-center">
               <h1 className="font-semibold text-white text-[20px]">Logged In</h1>
               <p className="font-[#97989F] font-normal text-[#97989F] text-[20px]">You are logged in!</p>
-              <button
-                onClick={handleLogout}
-                className="rounded-md p-2 text-white font-semibold bg-[#4B6BFB] py-[12px] px-[16px] w-[320px] mt-2 transition-opacity duration-300 hover:opacity-80"
-              >
-                Logout
-              </button>
+             
             </div>
           )}
         </div>
