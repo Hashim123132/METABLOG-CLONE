@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
@@ -18,17 +20,18 @@ const handleError = (res, error, message = 'Internal server error', status = 500
     error: error.message,
   });
 };
-
-// Ensure 'uploads' directory exists
+// Ensure 'uploads/profile_pic' directory exists
 const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+const profilePicDir = path.join(uploadsDir, 'profile_pic');
+
+if (!fs.existsSync(profilePicDir)) {
+  fs.mkdirSync(profilePicDir, { recursive: true });
 }
 
 // Set up multer for image upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadsDir); // Save images to 'uploads' folder
+    cb(null, profilePicDir); // Save images to 'uploads/profile_pic' folder
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Unique file name with timestamp
@@ -75,6 +78,7 @@ router.get('/dashboard', authMiddleware, (req, res) => {
 });
 
 // 3. Update User Profile who currently exists in db (Authenticated)
+// Route to handle profile update
 router.put('/profile', authMiddleware, upload, [
   // Validation rules for name and email
   body('name').not().isEmpty().withMessage('Name is required'),
@@ -98,7 +102,7 @@ router.put('/profile', authMiddleware, upload, [
   }
 
   const { name, email } = req.body;
-  const image = req.file ? `/uploads/${req.file.filename}` : null;  // Fixing the path syntax
+  const image = req.file ? `/uploads/profile_pic/${req.file.filename}` : null;  // Correcting the image path
 
   try {
     // Update the user
