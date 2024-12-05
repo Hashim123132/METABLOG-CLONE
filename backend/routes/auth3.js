@@ -20,7 +20,8 @@ const handleError = (res, error, message = 'Internal server error', status = 500
     error: error.message,
   });
 };
-// Ensure 'uploads/profile_pic' directory exists
+
+// Ensure 'uploads' and 'uploads/profile_pic' directories exist
 const uploadsDir = path.join(__dirname, '../uploads');
 const profilePicDir = path.join(uploadsDir, 'profile_pic');
 
@@ -31,24 +32,56 @@ if (!fs.existsSync(profilePicDir)) {
 // Set up multer for image upload
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, profilePicDir); // Save images to 'uploads/profile_pic' folder
+    // Check if the request is for profile picture or blog image
+    if (req.body.imageType === 'profile') {
+      cb(null, profilePicDir); // Save to 'uploads/profile_pic'
+    } else {
+      cb(null, uploadsDir); // Save to 'uploads' (for blog images)
+    }
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname)); // Unique file name with timestamp
+    // Generate a unique file name using timestamp
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
+// Set up file filter for conditional image types (JPEG for profile, PNG for blog)
+const fileFilter = (req, file, cb) => {
+  if (req.body.imageType === 'profile' && file.mimetype === 'image/jpeg') {
+    // Allow only JPEG for profile pictures
+    cb(null, true);
+  } else if (req.body.imageType !== 'profile' && file.mimetype === 'image/png') {
+    // Allow only PNG for blog images
+    cb(null, true);
+  } else {
+    // Reject other file types
+    const error = new Error('Invalid file type');
+    error.status = 400;
+    cb(error, false);
+  }
+};
+// Create multer upload middleware with storage and file filter
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith('image/')) {
-      return cb(new Error('Only image files are allowed'), false);
-    }
-    cb(null, true);
-  }
+  fileFilter: fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // Limit file size to 5MB
 }).single('image'); // 'image' is the field name in the form
-
+function uploadErrorHandler(err, req, res, next) {
+  if (err instanceof multer.MulterError) {
+    // Multer specific errors
+    return res.status(400).json({
+      success: false,
+      message: err.message
+    });
+  } else if (err) {
+    // General errors
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error',
+    });
+  }
+  next();
+}
 // 1. Get User Profile (Authenticated)
 router.get('/profile', authMiddleware,  async (req, res) => {
   try {
@@ -78,21 +111,20 @@ router.get('/dashboard', authMiddleware, (req, res) => {
 });
 
 // 3. Update User Profile who currently exists in db (Authenticated)
-// Route to handle profile update
-router.put('/profile', authMiddleware, upload, [
-  // Validation rules for name and email
+router.put('/profile', authMiddleware, upload, uploadErrorHandler, [
   body('name').not().isEmpty().withMessage('Name is required'),
   body('email')
     .isEmail().withMessage('A valid email is required')
+    .normalizeEmail()
     .custom(async (value, { req }) => {
       const existingUser = await User.findOne({ email: value });
       if (existingUser && existingUser.id !== req.user.id) {
         throw new Error('Email is already taken');
       }
       return true;
-    })
+    }),
+  body('imageType').isIn(['profile', 'blog']).withMessage('Invalid image type'),
 ], async (req, res) => {
-  // Handle validation errors
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -102,21 +134,15 @@ router.put('/profile', authMiddleware, upload, [
   }
 
   const { name, email } = req.body;
-  const image = req.file ? `/uploads/profile_pic/${req.file.filename}` : null;  // Correcting the image path
+  const image = req.file ? `/uploads/profile_pic/${req.file.filename}` : null;
 
   try {
-    // Update the user
     const updatedUser = await User.findByIdAndUpdate(
-      req.user.id, // User ID from the JWT token
-      { 
-        name, 
-        email, 
-        image, // Update the image field if provided, otherwise null
-      },
-      { new: true, runValidators: true } // Return the updated user with validation
-    ).select('-password'); // Exclude password from the response
+      req.user.id, 
+      { name, email, image },
+      { new: true, runValidators: true }
+    ).select('-password');
 
-    // If user is not found
     if (!updatedUser) {
       return res.status(404).json({
         success: false,
@@ -124,13 +150,11 @@ router.put('/profile', authMiddleware, upload, [
       });
     }
 
-    // Return the updated user data
     res.json({
       success: true,
       data: updatedUser,
     });
   } catch (error) {
-    // Generic error handler
     console.error(error);
     res.status(500).json({
       success: false,

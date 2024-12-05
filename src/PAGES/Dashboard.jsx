@@ -1,7 +1,10 @@
-import React, { useState, useEffect, useRef } from "react"; // Import useRef
+import  { useState, useEffect,useContext  } from "react"; // Import useRef
 import { useNavigate, Link } from "react-router-dom";
+import AlertContext from "../Context/Alert/AlertContext";
 
 const Dashboard = () => {
+  const { showAlert } = useContext(AlertContext);
+
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -9,7 +12,6 @@ const Dashboard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isProfileEditing, setIsProfileEditing] = useState(false); // New state for profile editing
   const [currentBlog, setCurrentBlog] = useState(null);
-  const [profilePicPreview, setProfilePicPreview] = useState(null);
 
   const [hasProfilePic, setHasProfilePic] = useState(!!user?.image);
 
@@ -20,7 +22,6 @@ const Dashboard = () => {
   });
   const [updatedProfile, setUpdatedProfile] = useState({ name: "", email: "" }); // New state for profile update
   const navigate = useNavigate();
-  const fileInput = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -176,9 +177,35 @@ const Dashboard = () => {
       return;
     }
   
+    // Check if the required fields (title and content) are filled out
+    if (!newBlog.title || !newBlog.content) {
+      setErrorMessage("Title and content are required.");
+      return;
+    }
+  
+    // If there's an image, check its type
+    if (newBlog.image) {
+      const imageType = newBlog.image.type; // Get the MIME type of the image
+  
+      // Check if the image is JPG, and if so, alert the user
+      if (imageType === "image/jpeg") {
+        showAlert("You might be using a JPG image. Please upload a PNG image instead.","danger");
+        return; // Stop the process and prevent form submission
+      }
+  
+      // Optionally, you could check for other types (if necessary)
+      if (imageType !== "image/png") {
+        showAlert("Invalid image type. Only PNG images are allowed.","danger");
+        return; // Stop the process and prevent form submission
+      }
+    }
+  
+    // Proceed with form submission if no issues
     const formData = new FormData();
     formData.append("title", newBlog.title);
     formData.append("content", newBlog.content);
+  
+    // Only append image if it exists
     if (newBlog.image) {
       formData.append("image", newBlog.image);
     }
@@ -199,7 +226,12 @@ const Dashboard = () => {
           // Reset the newBlog state to clear the form
           setNewBlog({ title: "", content: "", image: null });
         } else {
-          setErrorMessage("Error creating blog");
+          // Handle validation errors returned by the backend
+          if (data.errors) {
+            setErrorMessage(data.errors.map(err => err.msg).join(", "));
+          } else {
+            setErrorMessage("Error creating blog");
+          }
         }
       })
       .catch((error) => {
@@ -208,11 +240,13 @@ const Dashboard = () => {
       });
   };
   
+  
 
   const handleImageChange = (e) => {
     setNewBlog({ ...newBlog, image: e.target.files[0] });
+    
   };
-
+  //edit name and email here:
   const handleProfileEditToggle = () => {
     setIsProfileEditing(!isProfileEditing);
 
@@ -227,17 +261,21 @@ const Dashboard = () => {
   
     // Check if the user logged in with Google
     const isGoogleUser = user?.googleId; // Assume googleId exists if user logged in with Google
-  
+
     const formData = new FormData();
-  
+    // If the user is not a Google user, they can update their profile details
+
     if (!isGoogleUser) {
       formData.append("name", updatedProfile.name);
       formData.append("email", updatedProfile.email);
+      formData.append("imageType", "profile"); // Specify imageType for profile picture
     }
-  
+    // If the user is uploading a new profile picture, append it to the form data
+
     if (updatedProfile.profilePic) {
       formData.append("image", updatedProfile.profilePic);
     }
+  
     fetch(`http://localhost:5000/api/auth3/profile`, {
       method: "PUT",
       headers: {
@@ -250,11 +288,12 @@ const Dashboard = () => {
         if (data.success) {
           setUser(data.data); 
           localStorage.setItem("user", JSON.stringify(data.data)); 
-          setHasProfilePic(data.data.image !== null); 
-          setIsProfileEditing(false); 
+          setHasProfilePic(data.data.image !== null); // Update the state for profile picture
+          setIsProfileEditing(false); // Stop editing mode
           alert("Profile updated successfully!");
         } else {
-          setErrorMessage("Error updating profile");
+          // Display a more specific error message if available
+          setErrorMessage(data.message || "Error updating profile");
         }
       })
       .catch((error) => {
@@ -315,7 +354,6 @@ const Dashboard = () => {
         ...updatedProfile,
         profilePic: file,
       });
-      setProfilePicPreview(URL.createObjectURL(file)); // This will be used for preview purposes
     }
   };
 
