@@ -284,12 +284,26 @@ router.get('/blogs', authMiddleware, async (req, res) => {
     res.json({
       success: true,
       data: blogs,
+      
     });
+    
   } catch (error) {
     handleError(res, error);
   }
 });
 
+// for blog details2
+router.get('/blogs/:id', authMiddleware, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id).populate('author', 'name image');
+    if (!blog) {
+      return res.status(404).json({ success: false, message: "Blog not found" });
+    }
+    res.json({ success: true, data: blog });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
 // 5. Create Blog (Authenticated)
 router.post('/blogs', authMiddleware, upload, [
   body('title').not().isEmpty().withMessage('Title is required'),
