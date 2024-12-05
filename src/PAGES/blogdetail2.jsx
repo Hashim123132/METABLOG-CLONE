@@ -85,9 +85,10 @@ const BlogDetail2 = () => {
 
   // Navigate to the Author's page
   const handleAuthorPage = () => {
-    if (blog?.author?.name) {
-      navigate(`/author/${blog.author.name.replace(/\s/g, "").toLowerCase()}`);
-    }
+    
+    navigate("/dashboard");
+
+    
   };
 
   // Show loading or error messages
