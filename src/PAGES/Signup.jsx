@@ -1,44 +1,43 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import  { useState, useContext } from "react";
+
 import { GoogleLogin } from '@react-oauth/google'; // Import GoogleLogin
 import CustomAlert from './CustomAlert'; // CustomAlert for success/error messages
+import AlertContext from "../Context/Alert/AlertContext";
+
+ 
 
 const Signup = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const { showAlert } = useContext(AlertContext);
+
+
   const navigate = useNavigate();
 
-const handleGoogleSuccess = async (response) => {
+  const handleGoogleLogin = async (response) => {
     try {
-      const { credential } = response; // Get the Google token
+      const googleToken = response.credential;
 
-      // Send the Google token to the backend for authentication
-      const googleResponse = await fetch('http://localhost:5000/api/auth/google-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: credential }), // Send token to backend
+      const res = await fetch("http://localhost:5000/api/auth/google-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: googleToken }),
       });
 
-      const data = await googleResponse.json();
-
-      if (data.success) {
-        // Store the token in localStorage to authenticate the user
-        localStorage.setItem('token', data.token);
-        setSuccessMessage('Google sign-in successful! Redirecting to Dashboard...');
-        // Redirect to the Dashboard page after successful login
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 2000);
+      const json = await res.json();
+      if (json.success && json.authToken) {
+        localStorage.setItem("token", json.authToken);
+        showAlert("User logged in successfully via Google", "success");
+        navigate("/"); // Navigate to the home page
       } else {
-        setErrorMessage(data.message || 'Google sign-in failed');
+        showAlert(`Google login failed: ${json.message || "Unknown error"}`, "danger");
       }
     } catch (error) {
-      console.error('Error during Google sign-in:', error);
-      setErrorMessage('Error with Google sign-in. Please try again later.');
-    }
+      console.error("Error during Google login:", error);
+      showAlert(`Error during Google login: ${error.message || "Unknown error"}`, "danger");
+    } 
   };
 
   const handleSubmit = async (e) => {
@@ -133,11 +132,12 @@ const handleGoogleSuccess = async (response) => {
           >
             Sign Up
           </button>
+          
 
           {/* Google Login Button */}
           <div className="mt-4">
             <GoogleLogin
-              onSuccess={handleGoogleSuccess}
+              onSuccess={handleGoogleLogin}
               onError={() => setErrorMessage('Google sign-in failed')}
               clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}
             />
