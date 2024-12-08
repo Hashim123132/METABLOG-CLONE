@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/jsx-no-undef */
+/* eslint-disable no-undef */
 import React from 'react'
 
 const Bloglisting = () => {

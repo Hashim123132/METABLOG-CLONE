@@ -1,7 +1,8 @@
-import React from "react";
+/* eslint-disable no-unused-vars */
 import { useParams } from "react-router-dom"; // Import useParams to get the blog ID from the URL
 import { getBlogById } from "./blogData"; // Import the function to get blog data
 import { useNavigate } from 'react-router-dom';
+import React from "react";
 
 const BlogDetail = () => {
   const { id } = useParams(); // Get the blog ID from the URL params

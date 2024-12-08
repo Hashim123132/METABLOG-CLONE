@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const mongoose = require('mongoose');
 
 const BlogSchema = new mongoose.Schema({
@@ -17,11 +18,12 @@ const BlogSchema = new mongoose.Schema({
   image: {
     type: String, // This will store the image URL
     default: null,
-  },
-  tags: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Tag',  // Refers to the Tag model
-  }],
-}, { timestamps: true });
+ },
+ tag: { type: String, required: true }, // New field for the tag
+
+
+
+}, 
+ { timestamps: true });
 
 module.exports = mongoose.model('Blog', BlogSchema);

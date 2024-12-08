@@ -80,12 +80,12 @@ const handleGoogleSuccess = async (response) => {
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  // const handleChange = (e) => {
+  //   setFormData({
+  //     ...formData,
+  //     [e.target.name]: e.target.value,
+  //   });
+  // };
   return (
     <form onSubmit={handleSubmit} noValidate>
       <div className="flex justify-center items-center h-screen">

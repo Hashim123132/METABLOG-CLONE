@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 require('dotenv').config();
 const connectToMongo = require('./db'); 
 const express = require('express');

@@ -1,4 +1,4 @@
-import React, { useEffect,useRef } from 'react';
+import { useEffect, } from 'react';
 import './App.css';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'; // Import useLocation
 import { CSSTransition, TransitionGroup } from 'react-transition-group'; // Import transition group
@@ -17,7 +17,7 @@ import Alert from './PAGES/Alert';
 import Darkmode from './PAGES/darkmode';
 import AuthorBio from './PAGES/AuthorBio';
 import Dashboard from './PAGES/Dashboard';
-import BlogDetail2 from './PAGES/blogdetail2';  // Import the new BlogDetail2 component
+import BlogDetail2 from './PAGES/blogdetail2';
 
 import ProtectedRoute from './PAGES/ProtectedRoute'; // Import ProtectedRoute for protecting the Dashboard
 

@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import React from "react";
 
 const BlogDetail2 = () => {
   const { id } = useParams(); // Get the blog ID from URL params

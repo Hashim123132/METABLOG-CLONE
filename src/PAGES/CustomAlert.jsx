@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 const CustomAlert = ({ message, type, onClose }) => {
   return (
     <div

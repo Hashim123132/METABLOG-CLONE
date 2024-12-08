@@ -1,3 +1,6 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
+
 const { OAuth2Client } = require('google-auth-library');
 
 // Create a new instance of OAuth2Client using your Google client ID

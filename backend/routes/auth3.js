@@ -276,17 +276,15 @@ router.delete('/delete-profile-pic', authMiddleware, async (req, res) => {
 
 
 
-// 4. Get User Blogs (Authenticated)
+// Get all blogs for a user (Authenticated)
 router.get('/blogs', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id;  // Get the authenticated user's ID
     const blogs = await Blog.find({ author: userId }); // Filter blogs by authorId
     res.json({
       success: true,
-      data: blogs,
-      
+      data: blogs,  // This will include the tag as well
     });
-    
   } catch (error) {
     handleError(res, error);
   }
@@ -308,6 +306,9 @@ router.get('/blogs/:id', authMiddleware, async (req, res) => {
 router.post('/blogs', authMiddleware, upload, [
   body('title').not().isEmpty().withMessage('Title is required'),
   body('content').not().isEmpty().withMessage('Content is required'),
+  body('tag').not().isEmpty().withMessage('Tag is required')  // Check if tag is provided
+    .isIn(['technology', 'health', 'lifestyle'])  // Ensure the tag is one of the allowed values
+    .withMessage('Invalid tag'),  // Error message if tag is not valid
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -317,7 +318,7 @@ router.post('/blogs', authMiddleware, upload, [
     });
   }
 
-  const { title, content } = req.body;
+  const { title, content, tag } = req.body;  // Extract the tag from the request body
   const image = req.file ? `/uploads/${req.file.filename}` : null; // Store the image URL
 
   try {
@@ -327,6 +328,7 @@ router.post('/blogs', authMiddleware, upload, [
       content,
       author: req.user.id,  // The author is set to the logged-in user's ID
       image,  // Store image URL in the blog
+      tag,  // Store the tag in the blog
     });
 
     // Save the blog to the database
@@ -342,6 +344,7 @@ router.post('/blogs', authMiddleware, upload, [
     handleError(res, error, 'Failed to create blog. Please try again later.');
   }
 });
+
 
 // 6. Update Blog (Authenticated, Author check)
 router.put('/blogs/:id', authMiddleware, upload, async (req, res) => {

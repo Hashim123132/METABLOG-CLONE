@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 const blogs = [
   {
     id: 1,

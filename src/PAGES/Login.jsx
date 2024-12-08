@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import  { useState, useContext, useEffect } from "react";
 import AlertContext from "../Context/Alert/AlertContext";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
@@ -81,13 +81,13 @@ const Login = () => {
   };
 
   // Handle input changes for email and password
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials((prevCredentials) => ({
-      ...prevCredentials,
-      [name]: value,
-    }));
-  };
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setCredentials((prevCredentials) => ({
+  //     ...prevCredentials,
+  //     [name]: value,
+  //   }));
+  // };
   return (
     <div>
       <div className="flex justify-center items-center h-screen">

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-undef */
 // src/routes/auth.js
 
 const express = require('express');
@@ -23,7 +25,7 @@ const sendErrorResponse = (res, message, status = 500) => {
 
 // Route for traditional Signup (email/password, name)
 router.post('/Signup', async (req, res) => {
-  const { email, password, name } = req.body; 
+  const { email, password, name } = req.body;
 
   if (!email || !password || !name) {
     return sendErrorResponse(res, 'Email, password, and name are required.', 400);
@@ -31,21 +33,26 @@ router.post('/Signup', async (req, res) => {
 
   try {
     // Check if user already exists
+    console.log('Checking if user exists...');
     let user = await User.findOne({ email });
     if (user) {
       return sendErrorResponse(res, 'User already exists.', 400);
     }
 
     // Hash the password before saving
+    console.log('Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    
+    console.log('Creating new user...');
     // Create new user
     user = new User({ email, name, password: hashedPassword });
     await user.save();
 
+    console.log('Generating JWT...');
     // Generate a JWT token for the authenticated user
     const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
 
+    console.log('Sending response...');
     // Send the JWT token back to the frontend
     res.json({
       success: true,
@@ -53,9 +60,11 @@ router.post('/Signup', async (req, res) => {
       message: 'User signed up successfully',
     });
   } catch (error) {
+    console.error('Error during Signup:', error);
     sendErrorResponse(res, 'Error during Signup', 500);
   }
 });
+
 
 // Route for traditional login (email/password)
 router.post('/Login', async (req, res) => {

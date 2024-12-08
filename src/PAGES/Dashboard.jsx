@@ -19,6 +19,8 @@ const Dashboard = () => {
     title: "",
     content: "",
     image: null,
+    tag: ""
+
   });
   const [updatedProfile, setUpdatedProfile] = useState({ name: "", email: "" }); // New state for profile update
   const navigate = useNavigate();
@@ -125,8 +127,10 @@ const Dashboard = () => {
       title: blog.title,
       content: blog.content,
       image: blog.image || null,
+      tag: blog.tag || "", // Set the current tag for editing
     });
   };
+  
 
   const handleUpdate = () => {
     const token = localStorage.getItem("token");
@@ -177,9 +181,9 @@ const Dashboard = () => {
       return;
     }
   
-    // Check if the required fields (title and content) are filled out
-    if (!newBlog.title || !newBlog.content) {
-      setErrorMessage("Title and content are required.");
+    // Check if the required fields (title, content, and tag) are filled out
+    if (!newBlog.title || !newBlog.content || !newBlog.tag) {
+      setErrorMessage("Title, content, and tag are required.");
       return;
     }
   
@@ -187,15 +191,13 @@ const Dashboard = () => {
     if (newBlog.image) {
       const imageType = newBlog.image.type; // Get the MIME type of the image
   
-      // Check if the image is JPG, and if so, alert the user
       if (imageType === "image/jpeg") {
-        showAlert("You might be using a JPG image. Please upload a PNG image instead.","danger");
+        showAlert("You might be using a JPG image. Please upload a PNG image instead.", "danger");
         return; // Stop the process and prevent form submission
       }
   
-      // Optionally, you could check for other types (if necessary)
       if (imageType !== "image/png") {
-        showAlert("Invalid image type. Only PNG images are allowed.","danger");
+        showAlert("Invalid image type. Only PNG images are allowed.", "danger");
         return; // Stop the process and prevent form submission
       }
     }
@@ -204,6 +206,7 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append("title", newBlog.title);
     formData.append("content", newBlog.content);
+    formData.append("tag", newBlog.tag);  // Append the tag
   
     // Only append image if it exists
     if (newBlog.image) {
@@ -224,11 +227,11 @@ const Dashboard = () => {
           setBlogs((prevBlogs) => [data.data, ...prevBlogs]);
   
           // Reset the newBlog state to clear the form
-          setNewBlog({ title: "", content: "", image: null });
+          setNewBlog({ title: "", content: "", image: null, tag: "" });
         } else {
           // Handle validation errors returned by the backend
           if (data.errors) {
-            setErrorMessage(data.errors.map(err => err.msg).join(", "));
+            setErrorMessage(data.errors.map((err) => err.msg).join(", "));
           } else {
             setErrorMessage("Error creating blog");
           }
@@ -239,6 +242,7 @@ const Dashboard = () => {
         console.error(error);
       });
   };
+  
   
   
 
@@ -514,6 +518,21 @@ const Dashboard = () => {
               className="border p-3 rounded mb-4 w-full dark:bg-custom-dark2 dark:text-white dark:border-custom-gray-2 resize-none"
               rows="4"
             />
+             <div >
+                  <label htmlFor="tag" className="block text-gray-700">Tag</label>
+                  <select
+                    id="tag"
+                    name="tag"
+                    value={newBlog.tag}
+                    onChange={(e) => setNewBlog({ ...newBlog, tag: e.target.value })}
+                    className="w-full p-2 mt-1 border  border-gray-300 dark:bg-custom-dark2 dar rounded-md"
+                  >
+                    <option value="">Select a tag</option>
+                    <option value="technology">Technology</option>
+                    <option value="health">Health</option>
+                    <option value="lifestyle">Lifestyle</option>
+                  </select>
+              </div>
             <input
               type="file"
               accept="image/*"
@@ -573,47 +592,56 @@ const Dashboard = () => {
 
         {/* Blog List */}
         <div className="grid grid-cols-3 gap-1 w-full">
-          {blogs.length > 0 ? (
-            blogs.map((blog) => (
-              <div
-                key={blog._id}
-                className="bg-white dark:bg-custom-dark2 dark:border dark:border-custom-gray-2 shadow-lg rounded-xl p-4 mb-4 h-[550px] w-[450px]"
-              >
-                <Link to={`/blogs/${blog._id}`}>
-                  {blog.image && (
-                    <img
-                      src={`http://localhost:5000${blog.image}`}
-                      alt={blog.title}
-                      className="mt-2 w-full h-64 object-cover rounded-lg"
-                    />
-                  )}
-                  <h3 className="text-3xl font-semibold dark:text-white">
-                    {blog.title}
-                  </h3>
-                </Link>
-                <p className="text-sm dark:text-white">{blog.content}</p>
-                <div className="flex justify-end mt-2">
-                  <button
-                    onClick={() => handleEdit(blog)}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded mr-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(blog._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center text-lg font-semibold py-4">
-              No blogs found.
-            </div>
+  {blogs.length > 0 ? (
+    blogs.map((blog) => (
+      <div
+        key={blog._id}
+        className="bg-white dark:bg-custom-dark2 dark:border dark:border-custom-gray-2 shadow-lg rounded-xl p-4 mb-4 h-[550px] w-[450px]"
+      >
+        <Link to={`/blogs/${blog._id}`}>
+          {blog.image && (
+            <img
+              src={`http://localhost:5000${blog.image}`}
+              alt={blog.title}
+              className="mt-2 w-full h-64 object-cover rounded-lg"
+            />
           )}
+          <h3 className="text-3xl font-semibold dark:text-white">
+            {blog.title}
+          </h3>
+        </Link>
+        {/* Display the tag */}
+        {blog.tag && (
+          <span className="bg-blue-500 p-1 rounded-md">
+            {blog.tag}
+          </span>
+        )}
+        <p className="text-sm dark:text-white">{blog.content}</p>
+
+
+        <div className="flex justify-end mt-2">
+          <button
+            onClick={() => handleEdit(blog)}
+            className="bg-yellow-500 text-white px-4 py-2 rounded mr-2"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => handleDelete(blog._id)}
+            className="bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Delete
+          </button>
         </div>
+      </div>
+    ))
+  ) : (
+    <div className="text-center text-lg font-semibold py-4">
+      No blogs found.
+    </div>
+  )}
+        </div>
+
       </div>
 
     
