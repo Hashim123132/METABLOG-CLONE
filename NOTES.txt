@@ -1,0 +1,8 @@
+JAB CLONE KARO TO .env backend k liye bana lo
+.env includes:
+EMAIL_USER = your email for contact us backend
+EMAIL_PASS ="app password"from google for contact us backend to work
+
+GOOGLE_CLIENT_ID = for google sign in option (oauth)
+GOOGLE_CLIENT_SECRET = for google sign in option(oauth)
+JWT_SECRET = for middleware

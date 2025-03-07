@@ -33,22 +33,18 @@ router.post('/Signup', async (req, res) => {
 
   try {
     // Check if user already exists
-    console.log('Checking if user exists...');
     let user = await User.findOne({ email });
     if (user) {
       return sendErrorResponse(res, 'User already exists.', 400);
     }
 
     // Hash the password before saving
-    console.log('Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    console.log('Creating new user...');
     // Create new user
     user = new User({ email, name, password: hashedPassword });
     await user.save();
 
-    console.log('Generating JWT...');
     // Generate a JWT token for the authenticated user
     const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
 

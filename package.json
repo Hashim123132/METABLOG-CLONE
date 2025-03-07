@@ -9,7 +9,7 @@
     "start": "vite",
     "lint": "eslint .",
     "preview": "vite preview",
-    "both": "concurrently \"npm run start\" \"cd backend && npx nodemon index.js\"  "
+    "both": "concurrently --raw \"npm run start\" \"cd backend && npx nodemon index.js\""
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
