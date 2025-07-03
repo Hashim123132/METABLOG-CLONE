@@ -27,36 +27,38 @@ const sendErrorResponse = (res, message, status = 500) => {
 router.post('/Signup', async (req, res) => {
   const { email, password, name } = req.body;
 
+  console.log('Received signup request with:', { email, passwordPresent: !!password, name });
+
   if (!email || !password || !name) {
+    console.log('Missing fields');
     return sendErrorResponse(res, 'Email, password, and name are required.', 400);
   }
 
   try {
-    // Check if user already exists
     let user = await User.findOne({ email });
+    console.log('User exists?', !!user);
+
     if (user) {
       return sendErrorResponse(res, 'User already exists.', 400);
     }
 
-    // Hash the password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create new user
+    console.log('Password hashed.');
+
     user = new User({ email, name, password: hashedPassword });
     await user.save();
+    console.log('User saved:', user._id);
 
-    // Generate a JWT token for the authenticated user
     const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
+    console.log('JWT generated.');
 
-    console.log('Sending response...');
-    // Send the JWT token back to the frontend
     res.json({
       success: true,
       authToken,
       message: 'User signed up successfully',
     });
   } catch (error) {
-    console.error('Error during Signup:', error);
+    console.error('Error during Signup:', error.message, error.stack);
     sendErrorResponse(res, 'Error during Signup', 500);
   }
 });
