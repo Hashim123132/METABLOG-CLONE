@@ -11,7 +11,7 @@ const User = require('../models/User');
 const axios = require('axios');
 const crypto = require("crypto");
 const nodemailer = require("nodemailer"); 
-
+const { JWT_SECRET } = require("../server");
 //to send verification email
 async function sendVerificationEmail(email, code) {
   const transporter = nodemailer.createTransport({
@@ -37,7 +37,7 @@ require('dotenv').config(); // Ensure .env is loaded
 
 // Google OAuth2 Client Setup using environment variables
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const JWT_SECRET = process.env.JWT_SECRET || ''; // Fallback JWT secret
+// const JWT_SECRET = process.env.JWT_SECRET || ''; // Fallback JWT secret
 
 // Error response helper
 const sendErrorResponse = (res, message, status = 500) => {

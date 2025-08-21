@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
+import crypto from "crypto";
 
 require('dotenv').config();
 const connectToMongo = require('./db'); 
@@ -24,9 +25,10 @@ app.use('/api/auth2', require('./routes/auth2'));
 app.use('/api/auth3', require('./routes/auth3'));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+const JWT_SECRET = crypto.randomBytes(64).toString("hex");
 
 
-
+module.exports.JWT_SECRET = JWT_SECRET;
 // Error Handling Middleware (catch all errors)
 app.use((err, req, res, next) => {
   console.error(err.stack);

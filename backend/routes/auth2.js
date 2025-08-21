@@ -21,7 +21,7 @@ const checkEmailConfig = () => {
 
 // Helper function to generate a verification token
 const generateVerificationCode = () => {
-  return Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit code
+  return crypto.randomInt(100000, 999999);  // Generates a 6-digit code
 };
 
 router.post('/createcontact', [
