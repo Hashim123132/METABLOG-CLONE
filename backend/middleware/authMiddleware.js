@@ -1,14 +1,14 @@
-// authMiddleware.js
-
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
-const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET ;
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../index.js"; // make sure server.js exports JWT_SECRET
 
 const authMiddleware = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', ''); // Get token from Authorization header
+  const token = req.header("Authorization")?.replace("Bearer ", ""); // Get token from Authorization header
   if (!token) {
-    return res.status(401).json({ success: false, message: 'No token, authorization denied' });
+    return res
+      .status(401)
+      .json({ success: false, message: "No token, authorization denied" });
   }
 
   try {
@@ -16,8 +16,10 @@ const authMiddleware = (req, res, next) => {
     req.user = decoded.user; // Attach user info to the request object
     next(); // Continue to the next middleware or route handler
   } catch (error) {
-    return res.status(401).json({ success: false, message: 'Token is not valid' });
+    return res
+      .status(401)
+      .json({ success: false, message: "Token is not valid" });
   }
 };
 
-module.exports = authMiddleware;
+export default authMiddleware;

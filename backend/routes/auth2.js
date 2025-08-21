@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 // contact us backend 
-const express = require('express');
-const nodemailer = require('nodemailer');
-const { body, validationResult } = require('express-validator');
-const crypto = require('crypto');
+import express from "express";
+import nodemailer from "nodemailer";
+import { body, validationResult } from "express-validator";
+import crypto from "crypto";
+
 const router = express.Router();
 
 // Access environment variables
@@ -105,4 +106,4 @@ router.get('/verify-email', (req, res) => {
   res.send('Your email has been successfully verified!');
 });
 
-module.exports = router;
+export default router;

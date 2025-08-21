@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   name: String,
@@ -13,5 +13,7 @@ const userSchema = new mongoose.Schema({
   verificationCode: { type: String },
   verificationCodeExpires: { type: Date },
 });
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-module.exports = mongoose.model('User', userSchema);
+
+export default User;

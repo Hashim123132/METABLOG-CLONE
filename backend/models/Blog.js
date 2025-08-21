@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const BlogSchema = new mongoose.Schema({
   title: {
@@ -25,5 +25,6 @@ const BlogSchema = new mongoose.Schema({
 
 }, 
  { timestamps: true });
+const Blog = mongoose.model("Blog", BlogSchema);
 
-module.exports = mongoose.model('Blog', BlogSchema);
+export default Blog;

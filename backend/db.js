@@ -19,9 +19,9 @@
 // -----------------if want to connect on Mongodb atlas----------
 
 /* eslint-disable no-undef */
-const mongoose = require('mongoose');
-require('dotenv').config(); // Load .env file
-
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 // Get the Mongo URI from environment variables
 const mongooseURI = process.env.MONGODB_URI;
 
@@ -34,4 +34,4 @@ const connectToMongo = async () => {
   }
 }
 
-module.exports = connectToMongo;
+export default connectToMongo;

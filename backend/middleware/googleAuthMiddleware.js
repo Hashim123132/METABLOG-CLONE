@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 
-const { OAuth2Client } = require('google-auth-library');
+import { OAuth2Client } from "google-auth-library";
 
 // Create a new instance of OAuth2Client using your Google client ID
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -41,4 +41,4 @@ const googleAuthMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = googleAuthMiddleware;
+export default googleAuthMiddleware;
