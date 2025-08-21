@@ -9,6 +9,28 @@ const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const axios = require('axios');
+const crypto = require("crypto");
+const nodemailer = require("nodemailer"); 
+
+//to send verification email
+async function sendVerificationEmail(email, code) {
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: process.env.EMAIL_USER, // Your Gmail or SMTP email
+      pass: process.env.EMAIL_PASS, // App password or SMTP password
+    },
+  });
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const verificationLink = `${FRONTEND_URL}/verify?code=${code}&email=${encodeURIComponent(email)}`;
+
+  await transporter.sendMail({
+    from: '"MetaBlog-Clone" <no-reply@MetaBlog-Clone.com>',
+    to: email,
+    subject: 'Verify your account',
+    html: `<p>Click <a href="${verificationLink}">here</a> to verify your account.</p>`,
+  });
+}
 
 // Load environment variables
 require('dotenv').config(); // Ensure .env is loaded
@@ -27,68 +49,113 @@ const sendErrorResponse = (res, message, status = 500) => {
 router.post('/Signup', async (req, res) => {
   const { email, password, name } = req.body;
 
-  console.log('Received signup request with:', { email, passwordPresent: !!password, name });
-
   if (!email || !password || !name) {
-    console.log('Missing fields');
     return sendErrorResponse(res, 'Email, password, and name are required.', 400);
   }
 
   try {
     let user = await User.findOne({ email });
-    console.log('User exists?', !!user);
-
     if (user) {
       return sendErrorResponse(res, 'User already exists.', 400);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('Password hashed.');
+    const verificationCode = crypto.randomBytes(20).toString('hex'); // or use nanoid
 
-    user = new User({ email, name, password: hashedPassword });
+    user = new User({ email, name, password: hashedPassword, verificationCode, isVerified: false, });
     await user.save();
-    console.log('User saved:', user._id);
 
-    const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
-    console.log('JWT generated.');
+    // Send the email
+    await sendVerificationEmail(email, verificationCode);
 
     res.json({
       success: true,
-      authToken,
-      message: 'User signed up successfully',
+      message: 'Signup successful. Please check your email to verify your account.',
     });
   } catch (error) {
-    console.error('Error during Signup:', error.message, error.stack);
+    console.error('Error during Signup:', error.message);
     sendErrorResponse(res, 'Error during Signup', 500);
+  }
+});
+//for verification email
+router.get('/verify', async (req, res) => {
+  const { code, email } = req.query;
+
+  const user = await User.findOne({ email, verificationCode: code });
+
+ if (!user) {
+  return res.redirect('http://localhost:5173/verify?status=invalid');
+}
+
+  user.isVerified = true;
+  user.verificationCode = undefined;
+  await user.save();
+
+  res.json({ success: true, message: 'Account verified successfully!' });
+});
+// Route for resending verification email
+router.post('/resend-verification', async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return sendErrorResponse(res, 'Email is required.', 400);
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return sendErrorResponse(res, 'User not found.', 404);
+    }
+
+    if (user.isVerified) {
+      return sendErrorResponse(res, 'User is already verified.', 400);
+    }
+
+    // Generate a new verification code
+    const verificationCode = crypto.randomBytes(20).toString('hex');
+    user.verificationCode = verificationCode;
+    await user.save();
+
+    await sendVerificationEmail(user.email, verificationCode);
+
+    res.json({
+      success: true,
+      message: 'Verification email resent. Please check your inbox.',
+    });
+  } catch (error) {
+    console.error('Error resending verification email:', error);
+    sendErrorResponse(res, 'Failed to resend verification email', 500);
   }
 });
 
 
 // Route for traditional login (email/password)
 router.post('/Login', async (req, res) => {
-  const { email, password } = req.body; // email, password from request
+  const { email, password } = req.body;
 
   if (!email || !password) {
     return sendErrorResponse(res, 'Email and password are required.', 400);
   }
 
   try {
-    // Find the user by email
     const user = await User.findOne({ email });
     if (!user) {
       return sendErrorResponse(res, 'Invalid email or password.', 400);
     }
 
-    // Compare the provided password with the stored hashed password
+    // Check if the user is verified
+    if (!user.isVerified) {
+      return sendErrorResponse(res, 'Please verify your email before logging in.', 403);
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return sendErrorResponse(res, 'Invalid email or password.', 400);
     }
 
-    // Generate a JWT token for the authenticated user
     const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET, { expiresIn: '1h' });
 
-    // Send the JWT token back to the frontend
     res.json({
       success: true,
       authToken,
@@ -98,7 +165,6 @@ router.post('/Login', async (req, res) => {
     sendErrorResponse(res, 'Error during login', 500);
   }
 });
-
 // Route for Google Login/Signup
 router.post('/google-login', async (req, res) => {
   const { token } = req.body; // Google token from frontend

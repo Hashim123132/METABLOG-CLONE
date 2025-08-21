@@ -7,5 +7,8 @@ GOOGLE_CLIENT_ID = for google sign in option (oauth)
 GOOGLE_CLIENT_SECRET = for google sign in option(oauth)
 JWT_SECRET = for middleware
 MONGO_URI= will have a username and a password.Keep in mind this username and password is comming from cluster user and password of database
+FRONTEND_URL= jahan pr bhi localhost port hai
+
 
 Don't change these above words just put values of them in backend .env and your app works but you should know where to get "EMAIL_PASS" "GOOGLE_CLIENT_ID" etc
+All these notes is for backend ".env"

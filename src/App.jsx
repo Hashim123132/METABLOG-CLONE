@@ -18,6 +18,8 @@ import Darkmode from './PAGES/darkmode';
 import AuthorBio from './PAGES/AuthorBio';
 import Dashboard from './PAGES/Dashboard';
 import BlogDetail2 from './PAGES/blogdetail2';
+import Verify from './PAGES/Verify'; 
+
 
 import ProtectedRoute from './PAGES/ProtectedRoute'; // Import ProtectedRoute for protecting the Dashboard
 
@@ -55,6 +57,7 @@ const RouteTransitions = () => {
           {/* Static Pages */}
           <Route path='/Pages' element={<Pages />} />
           <Route path='/Contact' element={<Contact />} />
+          <Route path="/verify" element={<Verify />} />
 
           {/* Use ProtectedRoute for Dashboard */}
           <Route
